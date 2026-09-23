@@ -496,7 +496,7 @@
       <div class="card-head"><h3>Add expense</h3></div>
       <form id="expenseForm" class="form-grid">
         <div class="field" style="grid-column:1/-1;">
-          <label for="exp-receipt">Scan a receipt (optional) — auto-fills amount, date &amp; category below</label>
+          <label for="exp-receipt">Scan a receipt (optional) — auto-fills amount, date, category, bill no. &amp; location below</label>
           <input id="exp-receipt" type="file" accept="image/*">
           <div id="exp-receipt-status" class="hint" style="margin-top:6px;"></div>
           <img id="exp-receipt-preview" alt="" style="display:none; max-width:160px; max-height:120px; border-radius:8px; margin-top:8px; border:1px solid var(--border);">
@@ -512,6 +512,8 @@
         <div class="field"><label for="exp-amount">Amount (USD)</label><input id="exp-amount" type="number" min="1" step="1" required></div>
         <div class="field"><label for="exp-date">Date</label><input id="exp-date" type="date" required></div>
         <div class="field"><label for="exp-employee">Employee</label><input id="exp-employee" type="text" placeholder="e.g. A. Bansal" required></div>
+        <div class="field"><label for="exp-billno">Bill / Invoice No. (optional)</label><input id="exp-billno" type="text" placeholder="e.g. INV-10432"></div>
+        <div class="field"><label for="exp-location">Location (optional)</label><input id="exp-location" type="text" placeholder="Venue / city on the bill"></div>
         <div class="field" style="grid-column:1/-1;"><label for="exp-notes">Notes (optional)</label><input id="exp-notes" type="text" placeholder="Client visit, offsite, …"></div>
         <div style="display:flex; align-items:flex-end;"><button class="btn btn-primary" type="submit">Submit expense</button></div>
       </form>
@@ -526,7 +528,7 @@
       </div>
       <div class="table-scroll">
         <table id="exp-table">
-          <thead><tr><th>Date</th><th>Business Unit</th><th>Project</th><th>Employee</th><th>Destination</th><th>Category</th><th>Amount</th><th></th></tr></thead>
+          <thead><tr><th>Date</th><th>Business Unit</th><th>Project</th><th>Employee</th><th>Destination</th><th>Location</th><th>Category</th><th>Bill No.</th><th>Amount</th><th></th></tr></thead>
           <tbody id="exp-tbody"></tbody>
         </table>
       </div>
@@ -628,7 +630,7 @@
     <div class="card">
       <form id="expenseFormEmp" class="form-grid">
         <div class="field" style="grid-column:1/-1;">
-          <label for="empexp-receipt">Scan a receipt (optional) — auto-fills amount, date &amp; category below</label>
+          <label for="empexp-receipt">Scan a receipt (optional) — auto-fills amount, date, category, bill no. &amp; location below</label>
           <input id="empexp-receipt" type="file" accept="image/*">
           <div id="empexp-receipt-status" class="hint" style="margin-top:6px;"></div>
           <img id="empexp-receipt-preview" alt="" style="display:none; max-width:160px; max-height:120px; border-radius:8px; margin-top:8px; border:1px solid var(--border);">
@@ -641,6 +643,8 @@
         </div>
         <div class="field"><label for="empexp-amount">Amount (USD)</label><input id="empexp-amount" type="number" min="1" step="1" required></div>
         <div class="field"><label for="empexp-date">Date</label><input id="empexp-date" type="date" required></div>
+        <div class="field"><label for="empexp-billno">Bill / Invoice No. (optional)</label><input id="empexp-billno" type="text" placeholder="e.g. INV-10432"></div>
+        <div class="field"><label for="empexp-location">Location (optional)</label><input id="empexp-location" type="text" placeholder="Venue / city on the bill"></div>
         <div class="field" id="empExpErrorWrap" style="grid-column:1/-1; display:none;"><span class="hint" style="color:var(--status-critical);" id="empExpError"></span></div>
         <div style="display:flex; align-items:flex-end;"><button class="btn btn-primary" type="submit">Submit</button></div>
       </form>
@@ -1245,7 +1249,7 @@
     { cat:"Lodging", words:["hotel","inn","resort","suites","lodging","motel","hostel"] },
     { cat:"Airfare", words:["airlines","airway","airport","flight","boarding pass","e-ticket","itinerary"] },
     { cat:"Transport", words:["uber","lyft","taxi","cab","parking","metro","transit","fuel","gas station","toll","ola","rental car"] },
-    { cat:"Meals", words:["restaurant","cafe","diner","food","kitchen","bar & grill","bistro","coffee","starbucks"] }
+    { cat:"Meals", words:["restaurant","cafe","diner","food","kitchen","bar & grill","bistro","coffee","starbucks","dinner","lunch","breakfast","meal","grill"] }
   ];
 
   var tesseractLoadPromise = null;
@@ -1294,7 +1298,11 @@
   function guessCategory(text){
     var lower = text.toLowerCase();
     for (var i=0;i<CATEGORY_KEYWORDS.length;i++){
-      if (CATEGORY_KEYWORDS[i].words.some(function(w){ return lower.indexOf(w) !== -1; })) return CATEGORY_KEYWORDS[i].cat;
+      var hit = CATEGORY_KEYWORDS[i].words.some(function(w){
+        var pattern = new RegExp("\\b" + w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "\\b", "i");
+        return pattern.test(lower);
+      });
+      if (hit) return CATEGORY_KEYWORDS[i].cat;
     }
     return "Other";
   }
@@ -1303,6 +1311,25 @@
     var lower = text.toLowerCase();
     var match = state.destinations.find(function(d){ return lower.indexOf(d.city.toLowerCase()) !== -1; });
     return match ? match.id : "";
+  }
+
+  function guessBillNo(text){
+    var re = /\b(?:invoice|receipt|bill|order|ref(?:erence)?)\s*(?:no\.?|number|num\.?|#)?\s*[:#]?\s*([A-Za-z0-9][A-Za-z0-9\-\/]{2,19})/gi;
+    var m;
+    while ((m = re.exec(text))){
+      if (/\d/.test(m[1]) && !/^(date|the|for|only|paid|from|due)$/i.test(m[1])) return m[1];
+    }
+    return "";
+  }
+
+  function guessLocation(text){
+    var destId = guessDestination(text);
+    if (destId){ var d = destMap()[destId]; return d.city+", "+d.country; }
+    var lines = text.split(/\n/).map(function(l){ return l.trim(); }).filter(Boolean).slice(0,8);
+    for (var i=0;i<lines.length;i++){
+      if (/^[A-Za-z][A-Za-z\s.'-]{2,30},\s*[A-Za-z][A-Za-z\s.'-]{2,30}$/.test(lines[i])) return lines[i];
+    }
+    return "";
   }
 
   async function handleReceiptUpload(evt, ids){
@@ -1327,11 +1354,15 @@
       var date = guessDate(text);
       var cat = guessCategory(text);
       var destId = guessDestination(text);
+      var billNo = guessBillNo(text);
+      var location = guessLocation(text);
       var found = [];
       if (amount){ document.getElementById(ids.amount).value = amount; found.push("amount "+money(amount)); }
       if (date){ document.getElementById(ids.date).value = date; found.push("date "+date); }
       document.getElementById(ids.cat).value = cat; found.push("category "+cat);
       if (destId && ids.dest){ document.getElementById(ids.dest).value = destId; found.push("destination "+destName(destId)); }
+      if (billNo && ids.billNo){ document.getElementById(ids.billNo).value = billNo; found.push("bill no. "+billNo); }
+      if (location && ids.location){ document.getElementById(ids.location).value = location; found.push("location "+location); }
       if (ids.notes){
         var firstLine = text.split(/\n/).map(function(l){ return l.trim(); }).filter(Boolean)[0] || "";
         var notesEl = document.getElementById(ids.notes);
@@ -1777,10 +1808,12 @@
     document.getElementById("exp-tbody").innerHTML = rows.length ? rows.map(function(e){
       var anomaly = flagged[e.id];
       var proj = projectName(e.projectId);
-      return '<tr><td>'+e.date+'</td><td>'+esc(buName(e.buId))+'</td><td>'+(proj?esc(proj):'<span class="hint">—</span>')+'</td><td>'+esc(e.employee)+'</td><td>'+esc(destName(e.destinationId))+'</td><td>'+esc(e.category)+'</td>'+
+      return '<tr><td>'+e.date+'</td><td>'+esc(buName(e.buId))+'</td><td>'+(proj?esc(proj):'<span class="hint">—</span>')+'</td><td>'+esc(e.employee)+'</td><td>'+esc(destName(e.destinationId))+'</td>'+
+        '<td>'+(e.location?esc(e.location):'<span class="hint">—</span>')+'</td><td>'+esc(e.category)+'</td>'+
+        '<td>'+(e.billNo?esc(e.billNo):'<span class="hint">—</span>')+'</td>'+
         '<td class="num">'+money(e.amount)+'</td>'+
         '<td>'+(anomaly? statusChip("serious","Anomaly") : '')+'</td></tr>';
-    }).join("") : '<tr><td colspan="8"><div class="empty">No transactions match this filter.</div></td></tr>';
+    }).join("") : '<tr><td colspan="10"><div class="empty">No transactions match this filter.</div></td></tr>';
   }
 
   function renderForecastView(){
@@ -2030,10 +2063,10 @@
   document.getElementById("empexp-bu").addEventListener("change", function(){ fillProjectSelect("empexp-project", "empexp-bu"); });
 
   document.getElementById("exp-receipt").addEventListener("change", function(evt){
-    handleReceiptUpload(evt, { status:"exp-receipt-status", preview:"exp-receipt-preview", amount:"exp-amount", date:"exp-date", cat:"exp-cat", dest:"exp-dest", notes:"exp-notes" });
+    handleReceiptUpload(evt, { status:"exp-receipt-status", preview:"exp-receipt-preview", amount:"exp-amount", date:"exp-date", cat:"exp-cat", dest:"exp-dest", billNo:"exp-billno", location:"exp-location", notes:"exp-notes" });
   });
   document.getElementById("empexp-receipt").addEventListener("change", function(evt){
-    handleReceiptUpload(evt, { status:"empexp-receipt-status", preview:"empexp-receipt-preview", amount:"empexp-amount", date:"empexp-date", cat:"empexp-cat", dest:"empexp-dest" });
+    handleReceiptUpload(evt, { status:"empexp-receipt-status", preview:"empexp-receipt-preview", amount:"empexp-amount", date:"empexp-date", cat:"empexp-cat", dest:"empexp-dest", billNo:"empexp-billno", location:"empexp-location" });
   });
 
   document.getElementById("expenseForm").addEventListener("submit", function(e){
@@ -2046,6 +2079,8 @@
       amount: +document.getElementById("exp-amount").value,
       date: document.getElementById("exp-date").value || new Date().toISOString().slice(0,10),
       employee: document.getElementById("exp-employee").value,
+      billNo: document.getElementById("exp-billno").value,
+      location: document.getElementById("exp-location").value,
       notes: document.getElementById("exp-notes").value,
       submittedBy: document.getElementById("exp-employee").value
     });
@@ -2070,6 +2105,8 @@
       amount: +document.getElementById("empexp-amount").value,
       date: document.getElementById("empexp-date").value || new Date().toISOString().slice(0,10),
       employee: state.actor,
+      billNo: document.getElementById("empexp-billno").value,
+      location: document.getElementById("empexp-location").value,
       notes: "",
       submittedBy: state.actor
     });
