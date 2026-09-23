@@ -495,6 +495,12 @@
     <div class="card">
       <div class="card-head"><h3>Add expense</h3></div>
       <form id="expenseForm" class="form-grid">
+        <div class="field" style="grid-column:1/-1;">
+          <label for="exp-receipt">Scan a receipt (optional) — auto-fills amount, date &amp; category below</label>
+          <input id="exp-receipt" type="file" accept="image/*">
+          <div id="exp-receipt-status" class="hint" style="margin-top:6px;"></div>
+          <img id="exp-receipt-preview" alt="" style="display:none; max-width:160px; max-height:120px; border-radius:8px; margin-top:8px; border:1px solid var(--border);">
+        </div>
         <div class="field"><label for="exp-bu">Business Unit</label><select id="exp-bu"></select></div>
         <div class="field"><label for="exp-dest">Destination</label><select id="exp-dest"></select></div>
         <div class="field"><label for="exp-project">Project</label><select id="exp-project"><option value="">No project / general</option></select></div>
@@ -621,6 +627,12 @@
     </div>
     <div class="card">
       <form id="expenseFormEmp" class="form-grid">
+        <div class="field" style="grid-column:1/-1;">
+          <label for="empexp-receipt">Scan a receipt (optional) — auto-fills amount, date &amp; category below</label>
+          <input id="empexp-receipt" type="file" accept="image/*">
+          <div id="empexp-receipt-status" class="hint" style="margin-top:6px;"></div>
+          <img id="empexp-receipt-preview" alt="" style="display:none; max-width:160px; max-height:120px; border-radius:8px; margin-top:8px; border:1px solid var(--border);">
+        </div>
         <div class="field"><label for="empexp-bu">Business Unit</label><select id="empexp-bu"></select></div>
         <div class="field"><label for="empexp-dest">Destination</label><select id="empexp-dest"></select></div>
         <div class="field"><label for="empexp-project">Project</label><select id="empexp-project"><option value="">No project / general</option></select></div>
@@ -1219,6 +1231,121 @@
       });
     });
     return flagged;
+  }
+
+  /* ============================== RECEIPT OCR ==============================
+     Client-side receipt scanning: extracts Amount / Date / Category (and, when
+     recognizable, Destination) from an uploaded photo so the traveler/Finance
+     doesn't have to retype them. Business Unit and Project are always chosen
+     by the person, never guessed. Runs fully in the browser via Tesseract.js
+     (loaded on demand from a CDN only when a receipt is actually uploaded) —
+     no server, no API key. Extracted fields are pre-filled but always
+     editable, and nothing is submitted until the person clicks Submit. */
+  var CATEGORY_KEYWORDS = [
+    { cat:"Lodging", words:["hotel","inn","resort","suites","lodging","motel","hostel"] },
+    { cat:"Airfare", words:["airlines","airway","airport","flight","boarding pass","e-ticket","itinerary"] },
+    { cat:"Transport", words:["uber","lyft","taxi","cab","parking","metro","transit","fuel","gas station","toll","ola","rental car"] },
+    { cat:"Meals", words:["restaurant","cafe","diner","food","kitchen","bar & grill","bistro","coffee","starbucks"] }
+  ];
+
+  var tesseractLoadPromise = null;
+  function loadTesseract(){
+    if (window.Tesseract) return Promise.resolve();
+    if (tesseractLoadPromise) return tesseractLoadPromise;
+    tesseractLoadPromise = new Promise(function(resolve, reject){
+      var s = document.createElement("script");
+      s.src = "https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js";
+      s.onload = function(){ resolve(); };
+      s.onerror = function(){ tesseractLoadPromise = null; reject(new Error("Failed to load the OCR engine (check your internet connection).")); };
+      document.head.appendChild(s);
+    });
+    return tesseractLoadPromise;
+  }
+
+  function guessAmount(text){
+    var labeled = text.match(/(?:total|amount due|grand total|balance due|amount paid)[^\d$]{0,15}\$?\s?(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)/i);
+    if (labeled) return parseFloat(labeled[1].replace(/,/g,""));
+    var all = text.match(/\$\s?\d{1,3}(?:,\d{3})*\.\d{2}/g);
+    if (all && all.length){
+      var nums = all.map(function(s){ return parseFloat(s.replace(/[$,\s]/g,"")); });
+      return Math.max.apply(null, nums);
+    }
+    return null;
+  }
+
+  function guessDate(text){
+    var m = text.match(/\b(20\d{2})-(\d{1,2})-(\d{1,2})\b/);
+    if (m) return normalizeDate(+m[1], +m[2], +m[3]);
+    m = text.match(/\b(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})\b/);
+    if (m){
+      var yr = +m[3]; if (yr < 100) yr += 2000;
+      return normalizeDate(yr, +m[1], +m[2]); // assumes MM/DD/YYYY
+    }
+    var months = "jan feb mar apr may jun jul aug sep oct nov dec".split(" ");
+    m = text.match(/\b(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\s+(\d{1,2}),?\s+(20\d{2})\b/i);
+    if (m) return normalizeDate(+m[3], months.indexOf(m[1].toLowerCase())+1, +m[2]);
+    return null;
+  }
+  function normalizeDate(y,mo,d){
+    if (mo<1||mo>12||d<1||d>31||y<2015||y>2035) return null;
+    return y+"-"+String(mo).padStart(2,"0")+"-"+String(d).padStart(2,"0");
+  }
+
+  function guessCategory(text){
+    var lower = text.toLowerCase();
+    for (var i=0;i<CATEGORY_KEYWORDS.length;i++){
+      if (CATEGORY_KEYWORDS[i].words.some(function(w){ return lower.indexOf(w) !== -1; })) return CATEGORY_KEYWORDS[i].cat;
+    }
+    return "Other";
+  }
+
+  function guessDestination(text){
+    var lower = text.toLowerCase();
+    var match = state.destinations.find(function(d){ return lower.indexOf(d.city.toLowerCase()) !== -1; });
+    return match ? match.id : "";
+  }
+
+  async function handleReceiptUpload(evt, ids){
+    var file = evt.target.files[0]; if (!file) return;
+    var statusEl = document.getElementById(ids.status);
+    var previewEl = ids.preview ? document.getElementById(ids.preview) : null;
+    if (previewEl){ previewEl.src = URL.createObjectURL(file); previewEl.style.display = "block"; }
+    statusEl.style.color = "";
+    statusEl.textContent = "Loading OCR engine…";
+    try {
+      await loadTesseract();
+      statusEl.textContent = "Reading receipt…";
+      var result = await window.Tesseract.recognize(file, "eng", {
+        logger: function(m){
+          if (m.status === "recognizing text" && typeof m.progress === "number"){
+            statusEl.textContent = "Reading receipt… " + Math.round(m.progress*100) + "%";
+          }
+        }
+      });
+      var text = (result && result.data && result.data.text) || "";
+      var amount = guessAmount(text);
+      var date = guessDate(text);
+      var cat = guessCategory(text);
+      var destId = guessDestination(text);
+      var found = [];
+      if (amount){ document.getElementById(ids.amount).value = amount; found.push("amount "+money(amount)); }
+      if (date){ document.getElementById(ids.date).value = date; found.push("date "+date); }
+      document.getElementById(ids.cat).value = cat; found.push("category "+cat);
+      if (destId && ids.dest){ document.getElementById(ids.dest).value = destId; found.push("destination "+destName(destId)); }
+      if (ids.notes){
+        var firstLine = text.split(/\n/).map(function(l){ return l.trim(); }).filter(Boolean)[0] || "";
+        var notesEl = document.getElementById(ids.notes);
+        if (firstLine && !notesEl.value) notesEl.value = firstLine.slice(0,80);
+      }
+      statusEl.style.color = "var(--status-good)";
+      statusEl.textContent = found.length
+        ? ("Extracted "+found.join(", ")+" — please review before submitting.")
+        : "Couldn't confidently read this receipt — please fill in the details manually.";
+    } catch(err){
+      console.warn("receipt OCR failed", err);
+      statusEl.style.color = "var(--status-critical)";
+      statusEl.textContent = "Couldn't read this receipt automatically — please enter the details manually.";
+    }
   }
 
   /* ============================== CHART HELPERS ============================== */
@@ -1902,6 +2029,13 @@
   document.getElementById("exp-bu").addEventListener("change", function(){ fillProjectSelect("exp-project", "exp-bu"); });
   document.getElementById("empexp-bu").addEventListener("change", function(){ fillProjectSelect("empexp-project", "empexp-bu"); });
 
+  document.getElementById("exp-receipt").addEventListener("change", function(evt){
+    handleReceiptUpload(evt, { status:"exp-receipt-status", preview:"exp-receipt-preview", amount:"exp-amount", date:"exp-date", cat:"exp-cat", dest:"exp-dest", notes:"exp-notes" });
+  });
+  document.getElementById("empexp-receipt").addEventListener("change", function(evt){
+    handleReceiptUpload(evt, { status:"empexp-receipt-status", preview:"empexp-receipt-preview", amount:"empexp-amount", date:"empexp-date", cat:"empexp-cat", dest:"empexp-dest" });
+  });
+
   document.getElementById("expenseForm").addEventListener("submit", function(e){
     e.preventDefault();
     addExpense({
@@ -1916,6 +2050,8 @@
       submittedBy: document.getElementById("exp-employee").value
     });
     e.target.reset();
+    document.getElementById("exp-receipt-status").textContent = "";
+    document.getElementById("exp-receipt-preview").style.display = "none";
   });
   document.getElementById("expenseFormEmp").addEventListener("submit", function(e){
     e.preventDefault();
@@ -1938,6 +2074,8 @@
       submittedBy: state.actor
     });
     e.target.reset();
+    document.getElementById("empexp-receipt-status").textContent = "";
+    document.getElementById("empexp-receipt-preview").style.display = "none";
   });
 
   /* ============================== BOOT ============================== */

@@ -13,8 +13,16 @@ MVP1/MVP2 scope from the proposal:
 - A role switcher (Finance/BU Leader vs. Employee) that changes what's visible
 - A Project Master list for tracking each project's budget by Business Unit / Department
 - A Login Settings screen for sign-in defaults and a directory of named users allowed to sign in per role
+- Receipt scanning on both expense forms: upload a photo and Amount, Date,
+  Category and (when recognizable) Destination are auto-filled via client-side
+  OCR, for review before submitting — Business Unit and Project are always
+  chosen by the person
 
-It's a single self-contained `index.html` — no build step, no dependencies.
+It's a single self-contained `index.html` — no build step, no bundled
+dependencies. (Receipt scanning is the one exception: it loads the
+[Tesseract.js](https://github.com/naptha/tesseract.js) OCR engine from a CDN,
+but only the moment someone actually uploads a receipt — an internet
+connection is needed for that one action, nothing else.)
 
 ## Run it
 
