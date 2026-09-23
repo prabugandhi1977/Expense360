@@ -330,6 +330,7 @@
       <div class="field-inline">
         <label for="actorInput">Name</label>
         <input class="chip" id="actorInput" type="text" value="Finance Team">
+        <span id="actorWarn" class="hint" style="color:var(--status-critical); display:none; white-space:nowrap;">Not in login directory</span>
       </div>
     </div>
   </div>
@@ -445,6 +446,44 @@
     </div>
   </section>
 
+  <!-- PROJECT MASTER -->
+  <section class="view" id="view-projects" data-role="finance">
+    <div class="view-head">
+      <div>
+        <h2>Project master</h2>
+        <p>Maintain the list of projects and the travel &amp; expense budget allocated to each, by Business Unit / Department.</p>
+      </div>
+    </div>
+    <div class="stat-grid" id="proj-bu-rollup"></div>
+    <div class="card">
+      <div class="card-head"><h3 id="projFormTitle">Add project</h3></div>
+      <form id="projectForm" class="form-grid">
+        <input type="hidden" id="proj-id">
+        <div class="field"><label for="proj-name">Project name</label><input id="proj-name" type="text" required></div>
+        <div class="field"><label for="proj-bu">Business Unit / Dept</label><select id="proj-bu" required></select></div>
+        <div class="field"><label for="proj-budget">Budget (USD)</label><input id="proj-budget" type="number" min="0" step="1" required></div>
+        <div class="field"><label for="proj-owner">Owner</label><input id="proj-owner" type="text" placeholder="e.g. A. Bansal" required></div>
+        <div class="field"><label for="proj-status">Status</label>
+          <select id="proj-status"><option>Planned</option><option>Active</option><option>On Hold</option><option>Completed</option></select>
+        </div>
+        <div class="field"><label for="proj-start">Start date</label><input id="proj-start" type="date"></div>
+        <div class="field"><label for="proj-end">End date</label><input id="proj-end" type="date"></div>
+        <div style="display:flex; align-items:flex-end; gap:8px;">
+          <button class="btn btn-primary" type="submit" id="projFormSubmit">Add project</button>
+          <button class="btn btn-ghost" type="button" id="projFormCancel" hidden>Cancel</button>
+        </div>
+      </form>
+    </div>
+    <div class="card" style="padding:0;">
+      <div class="table-scroll">
+        <table id="proj-table">
+          <thead><tr><th>Project</th><th>Business Unit</th><th>Budget</th><th>Owner</th><th>Status</th><th>Timeline</th><th></th></tr></thead>
+          <tbody id="proj-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
   <!-- EXPENSES -->
   <section class="view" id="view-expenses" data-role="finance">
     <div class="view-head">
@@ -526,6 +565,51 @@
     </div>
   </section>
 
+  <!-- LOGIN SETTINGS -->
+  <section class="view" id="view-settings" data-role="finance">
+    <div class="view-head">
+      <div>
+        <h2>Login settings</h2>
+        <p>Control sign-in defaults and maintain the directory of names allowed to sign in as Finance/BU Leader or Employee.</p>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><h3>Sign-in defaults</h3></div>
+      <div class="form-grid">
+        <div class="field"><label for="set-default-role">Default role on load</label>
+          <select id="set-default-role"><option value="finance">Finance / BU Leader</option><option value="employee">Employee</option></select>
+        </div>
+        <div class="field" style="justify-content:flex-end;">
+          <label style="display:flex; align-items:center; gap:8px; font-weight:600;"><input type="checkbox" id="set-require-user" style="width:auto;"> Require name to match an active directory user below</label>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><h3 id="userFormTitle">Add user</h3></div>
+      <form id="userForm" class="form-grid">
+        <input type="hidden" id="user-id">
+        <div class="field"><label for="user-name">Name</label><input id="user-name" type="text" required></div>
+        <div class="field"><label for="user-role">Role</label><select id="user-role"><option value="finance">Finance / BU Leader</option><option value="employee">Employee</option></select></div>
+        <div class="field"><label for="user-bu">Business Unit / Dept</label><select id="user-bu"><option value="">—</option></select></div>
+        <div class="field" style="justify-content:flex-end;">
+          <label style="display:flex; align-items:center; gap:8px; font-weight:600;"><input type="checkbox" id="user-active" checked style="width:auto;"> Active</label>
+        </div>
+        <div style="display:flex; align-items:flex-end; gap:8px;">
+          <button class="btn btn-primary" type="submit" id="userFormSubmit">Add user</button>
+          <button class="btn btn-ghost" type="button" id="userFormCancel" hidden>Cancel</button>
+        </div>
+      </form>
+    </div>
+    <div class="card" style="padding:0;">
+      <div class="table-scroll">
+        <table id="user-table">
+          <thead><tr><th>Name</th><th>Role</th><th>Business Unit</th><th>Status</th><th></th></tr></thead>
+          <tbody id="user-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
   <!-- SUBMIT EXPENSE (employee) -->
   <section class="view" id="view-submit" data-role="employee">
     <div class="view-head">
@@ -543,6 +627,7 @@
         </div>
         <div class="field"><label for="empexp-amount">Amount (USD)</label><input id="empexp-amount" type="number" min="1" step="1" required></div>
         <div class="field"><label for="empexp-date">Date</label><input id="empexp-date" type="date" required></div>
+        <div class="field" id="empExpErrorWrap" style="grid-column:1/-1; display:none;"><span class="hint" style="color:var(--status-critical);" id="empExpError"></span></div>
         <div style="display:flex; align-items:flex-end;"><button class="btn btn-primary" type="submit">Submit</button></div>
       </form>
     </div>
@@ -649,6 +734,29 @@
       ]}
   ];
 
+  var PROJECT_SEED = [
+    { id:"proj-apac-expansion", name:"APAC Market Expansion", buId:"sales", budget:85000, owner:"Ankita Bansal", status:"Active", startDate:"2026-01-15", endDate:"2026-09-30" },
+    { id:"proj-platform-migration", name:"Cloud Platform Migration", buId:"engineering", budget:60000, owner:"Rahul Dua", status:"Active", startDate:"2025-11-01", endDate:"2026-06-30" },
+    { id:"proj-brand-refresh", name:"Global Brand Refresh", buId:"marketing", budget:45000, owner:"Prabha Iyer", status:"Planned", startDate:"2026-02-01", endDate:"2026-08-15" },
+    { id:"proj-vendor-consolidation", name:"Vendor Consolidation Initiative", buId:"operations", budget:30000, owner:"Rajesh Simhadri", status:"Active", startDate:"2025-09-01", endDate:"2026-03-31" },
+    { id:"proj-onboarding-revamp", name:"Enterprise Onboarding Revamp", buId:"success", budget:25000, owner:"N. Fernandes", status:"Active", startDate:"2026-01-01", endDate:"2026-12-31" }
+  ];
+
+  var USER_SEED = [
+    { id:"user-finance-team", name:"Finance Team", role:"finance", buId:"", active:true },
+    { id:"user-prabha", name:"Prabha Iyer", role:"finance", buId:"marketing", active:true },
+    { id:"user-rajesh", name:"Rajesh Simhadri", role:"finance", buId:"operations", active:true },
+    { id:"user-ankita", name:"Ankita Bansal", role:"employee", buId:"sales", active:true },
+    { id:"user-vishal", name:"Vishal Rastogi", role:"employee", buId:"sales", active:true },
+    { id:"user-rahul", name:"Rahul Dua", role:"employee", buId:"engineering", active:true },
+    { id:"user-ashwini", name:"Ashwini S R", role:"employee", buId:"engineering", active:true },
+    { id:"user-rajeesh", name:"Rajeesh Raghunathan", role:"employee", buId:"marketing", active:true },
+    { id:"user-fernandes", name:"N. Fernandes", role:"employee", buId:"success", active:true },
+    { id:"user-menon", name:"K. Menon", role:"employee", buId:"success", active:true }
+  ];
+
+  var DEFAULT_SETTINGS = { defaultRole:"finance", requireKnownUser:false };
+
   function daysAgo(n){ var d = new Date(); d.setDate(d.getDate()-n); return d.toISOString(); }
   function lastNMonths(n){
     var out = []; var now = new Date();
@@ -731,6 +839,9 @@
     expenses: [],
     alerts: [],
     auditLog: [],
+    projects: [],
+    users: [],
+    settings: Object.assign({}, DEFAULT_SETTINGS),
     dbMode: "connecting" // connecting | db | local
   };
 
@@ -739,10 +850,12 @@
     { id:"perdiem", label:"Per-Diem", role:"finance", icon:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6.3"/><path d="M8 4.6v3.6l2.4 1.4"/></svg>' },
     { id:"myperdiem", label:"My Per Diem", role:"employee", icon:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6.3"/><path d="M8 4.6v3.6l2.4 1.4"/></svg>' },
     { id:"budgets", label:"Budgets & Alerts", role:"finance", icon:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 1.6 14.4 5v6L8 14.4 1.6 11V5Z"/><path d="M8 6v2.6l1.8 1"/></svg>' },
+    { id:"projects", label:"Project Master", role:"finance", icon:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1.6 4.3c0-.66.53-1.2 1.2-1.2h3l1.2 1.5h6.4c.66 0 1.2.54 1.2 1.2v6.6c0 .66-.54 1.2-1.2 1.2H2.8c-.66 0-1.2-.54-1.2-1.2Z"/></svg>' },
     { id:"expenses", label:"Expenses", role:"finance", icon:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2.5" width="12" height="11" rx="1.2"/><path d="M4.5 6h7M4.5 8.6h7M4.5 11.2h4"/></svg>' },
     { id:"submit", label:"Submit Expense", role:"employee", icon:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2.5" width="12" height="11" rx="1.2"/><path d="M8 6v5M5.5 8.5h5"/></svg>' },
     { id:"forecast", label:"Forecast", role:"finance", icon:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1.7 12.5 6 7.2l3 2.6 5.3-6.3"/></svg>' },
-    { id:"audit", label:"Audit Log", role:"finance", icon:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 1.8h6.2L13 4.6v9.6H4Z"/><path d="M6 7.4h5M6 10h5"/></svg>' }
+    { id:"audit", label:"Audit Log", role:"finance", icon:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 1.8h6.2L13 4.6v9.6H4Z"/><path d="M6 7.4h5M6 10h5"/></svg>' },
+    { id:"settings", label:"Login Settings", role:"finance", icon:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3.5" y="7" width="9" height="7" rx="1.2"/><path d="M5.5 7V4.8a2.5 2.5 0 0 1 5 0V7"/></svg>' }
   ];
 
   function buMap(){ var m={}; state.businessUnits.forEach(function(b){ m[b.id]=b; }); return m; }
@@ -762,7 +875,8 @@
     try {
       localStorage.setItem(LOCAL_KEY, JSON.stringify({
         businessUnits: state.businessUnits, destinations: state.destinations,
-        expenses: state.expenses, alerts: state.alerts, auditLog: state.auditLog, seeded:true
+        expenses: state.expenses, alerts: state.alerts, auditLog: state.auditLog,
+        projects: state.projects, users: state.users, settings: state.settings, seeded:true
       }));
     } catch(e){}
   }
@@ -773,6 +887,9 @@
     state.expenses = buildSeedExpenses().map(function(e,i){ e.id = "seed-"+i; return e; });
     state.alerts = buildSeedAlerts().map(function(a,i){ a.id = "seed-"+i; return a; });
     state.auditLog = buildSeedAudit().map(function(a,i){ a.id = "seed-"+i; return a; });
+    state.projects = PROJECT_SEED.map(function(p){ return Object.assign({}, p); });
+    state.users = USER_SEED.map(function(u){ return Object.assign({}, u); });
+    state.settings = Object.assign({}, DEFAULT_SETTINGS);
   }
 
   function idFrom(prefix){ return prefix + "-" + Date.now().toString(36) + "-" + Math.floor(rand()*1e6).toString(36); }
@@ -799,6 +916,12 @@
           state.expenses = expSnap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
           state.alerts = alertSnap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
           state.auditLog = auditSnap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
+          var projSnap = await db.collection("projects").get();
+          var userSnap = await db.collection("users").get();
+          var settingsSnap = await db.doc("meta/settings").get();
+          state.projects = projSnap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
+          state.users = userSnap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
+          state.settings = Object.assign({}, DEFAULT_SETTINGS, settingsSnap.exists ? settingsSnap.data() : {});
         } else {
           freshSeed();
           await seedToDb();
@@ -814,6 +937,9 @@
       if (cached && cached.seeded){
         state.businessUnits = cached.businessUnits; state.destinations = cached.destinations;
         state.expenses = cached.expenses; state.alerts = cached.alerts; state.auditLog = cached.auditLog;
+        state.projects = cached.projects || PROJECT_SEED.map(function(p){ return Object.assign({}, p); });
+        state.users = cached.users || USER_SEED.map(function(u){ return Object.assign({}, u); });
+        state.settings = Object.assign({}, DEFAULT_SETTINGS, cached.settings || {});
       } else {
         freshSeed();
         saveLocal();
@@ -826,6 +952,8 @@
       var writes = [];
       state.businessUnits.forEach(function(b){ writes.push(db.collection("businessUnits").doc(b.id).set(stripId(b))); });
       state.destinations.forEach(function(d){ writes.push(db.collection("destinations").doc(d.id).set(stripId(d))); });
+      state.projects.forEach(function(p){ writes.push(db.collection("projects").doc(p.id).set(stripId(p))); });
+      state.users.forEach(function(u){ writes.push(db.collection("users").doc(u.id).set(stripId(u))); });
       await Promise.all(writes);
 
       // chunk expense/alert/audit writes to be gentle on the store
@@ -833,6 +961,7 @@
       await chunkedCreate("alerts", state.alerts);
       await chunkedCreate("auditLog", state.auditLog);
 
+      await db.doc("meta/settings").set(state.settings);
       await db.doc("meta/config").set({ seeded:true, seededAt:new Date().toISOString(), orgName:"Expense360 Demo Org" });
     } catch(e){
       console.warn("seeding db failed, continuing with in-memory seed", e);
@@ -864,6 +993,44 @@
     }
     saveLocal();
     return idFrom(kind);
+  }
+
+  function persistSettings(){
+    if (state.dbMode === "db" && db){
+      try { db.doc("meta/settings").set(state.settings); } catch(e){ console.warn("persist settings failed", e); }
+    }
+    saveLocal();
+  }
+
+  // Generic CRUD for explicit-id master-data collections (projects, users).
+  function addRecord(kind, arrKey, data){
+    var id = idFrom(kind);
+    var record = Object.assign({ id:id }, data);
+    state[arrKey].push(record);
+    if (state.dbMode === "db" && db){
+      try { db.collection(kind).doc(id).set(stripId(record)); } catch(e){ console.warn("create failed", kind, e); }
+    }
+    saveLocal();
+    return record;
+  }
+  function updateRecord(kind, arrKey, id, patch){
+    var rec = state[arrKey].find(function(r){ return r.id === id; }); if (!rec) return;
+    Object.assign(rec, patch);
+    persist(kind, "update", id, patch);
+    saveLocal();
+  }
+  function deleteRecord(kind, arrKey, id){
+    state[arrKey] = state[arrKey].filter(function(r){ return r.id !== id; });
+    if (state.dbMode === "db" && db){
+      try { db.collection(kind).doc(id).delete(); } catch(e){ console.warn("delete failed", kind, e); }
+    }
+    saveLocal();
+  }
+
+  function isKnownActiveUser(name, role){
+    if (!name) return false;
+    var n = name.trim().toLowerCase();
+    return state.users.some(function(u){ return u.active && u.role === role && u.name.trim().toLowerCase() === n; });
   }
 
   /* ============================== MUTATIONS ============================== */
@@ -1164,7 +1331,7 @@
       el.innerHTML = state.destinations.map(function(d){ return '<option value="'+d.id+'">'+esc(d.city)+', '+esc(d.country)+'</option>'; }).join("");
       if (current) el.value = current;
     });
-    ["exp-bu","empexp-bu"].forEach(function(id){
+    ["exp-bu","empexp-bu","proj-bu"].forEach(function(id){
       var el = document.getElementById(id); if (!el) return;
       var current = el.value;
       el.innerHTML = state.businessUnits.map(function(b){ return '<option value="'+b.id+'">'+esc(b.name)+'</option>'; }).join("");
@@ -1178,6 +1345,14 @@
     if (scope && scope.options.length <= 1){
       scope.innerHTML += state.businessUnits.map(function(b){ return '<option value="'+b.id+'">'+esc(b.name)+'</option>'; }).join("");
     }
+    var userBu = document.getElementById("user-bu");
+    if (userBu && userBu.options.length <= 1){
+      userBu.innerHTML += state.businessUnits.map(function(b){ return '<option value="'+b.id+'">'+esc(b.name)+'</option>'; }).join("");
+    }
+  }
+
+  function projectBudgetForBU(buId){
+    return state.projects.filter(function(p){ return p.buId === buId; }).reduce(function(s,p){ return s + (+p.budget||0); },0);
   }
 
   function renderOverview(){
@@ -1389,6 +1564,123 @@
     }).join("") : '<tr><td colspan="4"><div class="empty">No submissions yet under this name.</div></td></tr>';
   }
 
+  function renderProjectsView(){
+    if (state.role !== "finance") return;
+    fillDestinationSelects();
+
+    document.getElementById("proj-bu-rollup").innerHTML = state.businessUnits.map(function(b){
+      var allocated = projectBudgetForBU(b.id);
+      var p = b.annualBudget ? (allocated/b.annualBudget)*100 : 0;
+      var sev = p>=90?"critical":(p>=70?"warning":"good");
+      return '<div class="stat-tile">'+
+        '<span class="label">'+esc(b.name)+'</span>'+
+        '<span class="value" style="font-size:1.2rem;">'+money(allocated)+' <span style="font-size:.7rem; color:var(--ink-muted); font-family:var(--font-body);">/ '+money(b.annualBudget)+' T&amp;E budget</span></span>'+
+        '<div class="progress"><span style="width:'+Math.min(100,p)+'%; background:var(--status-'+sev+')"></span></div>'+
+        '<span class="delta">'+statusChip(sev, pct(p)+" of T&E budget allocated to projects")+'</span>'+
+      '</div>';
+    }).join("");
+
+    var tbody = document.getElementById("proj-tbody");
+    var rows = state.projects.slice().sort(function(a,b){ return a.name.localeCompare(b.name); });
+    tbody.innerHTML = rows.length ? rows.map(function(p){
+      var timeline = (p.startDate||"—") + " → " + (p.endDate||"—");
+      return '<tr><td><strong>'+esc(p.name)+'</strong></td><td>'+esc(buName(p.buId))+'</td><td class="num">'+money(p.budget)+'</td><td>'+esc(p.owner||"—")+'</td>'+
+        '<td><span class="badge badge-overridden">'+esc(p.status)+'</span></td>'+
+        '<td class="hint">'+esc(timeline)+'</td>'+
+        '<td><div style="display:flex; gap:6px;"><button class="btn btn-sm btn-ghost" data-edit-proj="'+p.id+'">Edit</button><button class="btn btn-sm btn-danger" data-del-proj="'+p.id+'">Delete</button></div></td></tr>';
+    }).join("") : '<tr><td colspan="7"><div class="empty">No projects yet. Add one above.</div></td></tr>';
+
+    tbody.querySelectorAll("[data-edit-proj]").forEach(function(btn){
+      btn.addEventListener("click", function(){
+        var p = state.projects.find(function(x){ return x.id === btn.getAttribute("data-edit-proj"); }); if (!p) return;
+        document.getElementById("proj-id").value = p.id;
+        document.getElementById("proj-name").value = p.name;
+        document.getElementById("proj-bu").value = p.buId;
+        document.getElementById("proj-budget").value = p.budget;
+        document.getElementById("proj-owner").value = p.owner||"";
+        document.getElementById("proj-status").value = p.status||"Planned";
+        document.getElementById("proj-start").value = p.startDate||"";
+        document.getElementById("proj-end").value = p.endDate||"";
+        document.getElementById("projFormTitle").textContent = "Edit project";
+        document.getElementById("projFormSubmit").textContent = "Update project";
+        document.getElementById("projFormCancel").hidden = false;
+        document.getElementById("projectForm").scrollIntoView({behavior:"smooth", block:"center"});
+      });
+    });
+    tbody.querySelectorAll("[data-del-proj]").forEach(function(btn){
+      btn.addEventListener("click", function(){
+        var id = btn.getAttribute("data-del-proj");
+        var p = state.projects.find(function(x){ return x.id === id; }); if (!p) return;
+        if (!window.confirm('Delete project "'+p.name+'"?')) return;
+        deleteRecord("projects", "projects", id);
+        pushAudit("Deleted project", p.name, "Removed from project master.");
+        renderAll();
+      });
+    });
+  }
+
+  function resetProjectForm(){
+    document.getElementById("projectForm").reset();
+    document.getElementById("proj-id").value = "";
+    document.getElementById("projFormTitle").textContent = "Add project";
+    document.getElementById("projFormSubmit").textContent = "Add project";
+    document.getElementById("projFormCancel").hidden = true;
+  }
+
+  function renderSettingsView(){
+    if (state.role !== "finance") return;
+    fillDestinationSelects();
+    document.getElementById("set-default-role").value = state.settings.defaultRole;
+    document.getElementById("set-require-user").checked = !!state.settings.requireKnownUser;
+
+    var tbody = document.getElementById("user-tbody");
+    var rows = state.users.slice().sort(function(a,b){ return a.name.localeCompare(b.name); });
+    tbody.innerHTML = rows.length ? rows.map(function(u){
+      return '<tr><td><strong>'+esc(u.name)+'</strong></td><td>'+(u.role==="finance"?"Finance / BU Leader":"Employee")+'</td><td>'+(u.buId?esc(buName(u.buId)):'<span class="hint">—</span>')+'</td>'+
+        '<td>'+(u.active? statusChip("good","Active") : statusChip("warning","Inactive"))+'</td>'+
+        '<td><div style="display:flex; gap:6px;"><button class="btn btn-sm btn-ghost" data-edit-user="'+u.id+'">Edit</button><button class="btn btn-sm btn-danger" data-del-user="'+u.id+'">Delete</button></div></td></tr>';
+    }).join("") : '<tr><td colspan="5"><div class="empty">No directory users yet.</div></td></tr>';
+
+    tbody.querySelectorAll("[data-edit-user]").forEach(function(btn){
+      btn.addEventListener("click", function(){
+        var u = state.users.find(function(x){ return x.id === btn.getAttribute("data-edit-user"); }); if (!u) return;
+        document.getElementById("user-id").value = u.id;
+        document.getElementById("user-name").value = u.name;
+        document.getElementById("user-role").value = u.role;
+        document.getElementById("user-bu").value = u.buId||"";
+        document.getElementById("user-active").checked = !!u.active;
+        document.getElementById("userFormTitle").textContent = "Edit user";
+        document.getElementById("userFormSubmit").textContent = "Update user";
+        document.getElementById("userFormCancel").hidden = false;
+        document.getElementById("userForm").scrollIntoView({behavior:"smooth", block:"center"});
+      });
+    });
+    tbody.querySelectorAll("[data-del-user]").forEach(function(btn){
+      btn.addEventListener("click", function(){
+        var id = btn.getAttribute("data-del-user");
+        var u = state.users.find(function(x){ return x.id === id; }); if (!u) return;
+        if (!window.confirm('Remove "'+u.name+'" from the login directory?')) return;
+        deleteRecord("users", "users", id);
+        pushAudit("Removed directory user", u.name, "Removed from login directory.");
+        renderAll();
+      });
+    });
+  }
+
+  function resetUserForm(){
+    document.getElementById("userForm").reset();
+    document.getElementById("user-id").value = "";
+    document.getElementById("user-active").checked = true;
+    document.getElementById("userFormTitle").textContent = "Add user";
+    document.getElementById("userFormSubmit").textContent = "Add user";
+    document.getElementById("userFormCancel").hidden = true;
+  }
+
+  function updateActorWarn(){
+    var el = document.getElementById("actorWarn");
+    el.style.display = (state.settings.requireKnownUser && !isKnownActiveUser(state.actor, state.role)) ? "inline" : "none";
+  }
+
   function renderAll(){
     renderSyncPill();
     renderTabbar();
@@ -1397,23 +1689,82 @@
     renderPerDiemTable();
     renderMyPerDiem();
     renderBudgetsView();
+    renderProjectsView();
     renderExpensesView();
     renderForecastView();
     renderAuditView();
     renderSubmitView();
+    renderSettingsView();
+    updateActorWarn();
   }
 
   /* ============================== EVENTS ============================== */
   document.getElementById("roleSelect").addEventListener("change", function(e){
     state.role = e.target.value;
-    state.actor = state.role === "employee" ? (state.businessUnits[0] ? state.businessUnits[0].employees[0] : "Employee") : "Finance Team";
+    var known = state.users.find(function(u){ return u.active && u.role === state.role; });
+    state.actor = known ? known.name : (state.role === "employee" ? (state.businessUnits[0] ? state.businessUnits[0].employees[0] : "Employee") : "Finance Team");
     document.getElementById("actorInput").value = state.actor;
     renderAll();
   });
-  document.getElementById("actorInput").addEventListener("change", function(e){ state.actor = e.target.value || state.actor; });
+  document.getElementById("actorInput").addEventListener("change", function(e){ state.actor = e.target.value || state.actor; renderAll(); });
   document.getElementById("alertFilter").addEventListener("change", renderBudgetsView);
   document.getElementById("exp-filter-bu").addEventListener("change", renderExpensesView);
   document.getElementById("forecastScope").addEventListener("change", renderForecastView);
+
+  document.getElementById("projectForm").addEventListener("submit", function(e){
+    e.preventDefault();
+    var id = document.getElementById("proj-id").value;
+    var data = {
+      name: document.getElementById("proj-name").value.trim(),
+      buId: document.getElementById("proj-bu").value,
+      budget: +document.getElementById("proj-budget").value || 0,
+      owner: document.getElementById("proj-owner").value.trim(),
+      status: document.getElementById("proj-status").value,
+      startDate: document.getElementById("proj-start").value,
+      endDate: document.getElementById("proj-end").value
+    };
+    if (id){
+      updateRecord("projects", "projects", id, data);
+      pushAudit("Updated project", data.name, "Budget "+money(data.budget)+" · "+buName(data.buId)+".");
+    } else {
+      addRecord("projects", "projects", data);
+      pushAudit("Added project", data.name, "Budget "+money(data.budget)+" · "+buName(data.buId)+".");
+    }
+    resetProjectForm();
+    renderAll();
+  });
+  document.getElementById("projFormCancel").addEventListener("click", resetProjectForm);
+
+  document.getElementById("userForm").addEventListener("submit", function(e){
+    e.preventDefault();
+    var id = document.getElementById("user-id").value;
+    var data = {
+      name: document.getElementById("user-name").value.trim(),
+      role: document.getElementById("user-role").value,
+      buId: document.getElementById("user-bu").value,
+      active: document.getElementById("user-active").checked
+    };
+    if (id){
+      updateRecord("users", "users", id, data);
+      pushAudit("Updated login directory user", data.name, (data.role==="finance"?"Finance / BU Leader":"Employee")+(data.active?"":" · inactive")+".");
+    } else {
+      addRecord("users", "users", data);
+      pushAudit("Added login directory user", data.name, (data.role==="finance"?"Finance / BU Leader":"Employee")+".");
+    }
+    resetUserForm();
+    renderAll();
+  });
+  document.getElementById("userFormCancel").addEventListener("click", resetUserForm);
+
+  document.getElementById("set-default-role").addEventListener("change", function(e){
+    state.settings.defaultRole = e.target.value;
+    persistSettings();
+  });
+  document.getElementById("set-require-user").addEventListener("change", function(e){
+    state.settings.requireKnownUser = e.target.checked;
+    persistSettings();
+    updateActorWarn();
+  });
 
   document.getElementById("expenseForm").addEventListener("submit", function(e){
     e.preventDefault();
@@ -1431,6 +1782,13 @@
   });
   document.getElementById("expenseFormEmp").addEventListener("submit", function(e){
     e.preventDefault();
+    var errWrap = document.getElementById("empExpErrorWrap"), errEl = document.getElementById("empExpError");
+    if (state.settings.requireKnownUser && !isKnownActiveUser(state.actor, "employee")){
+      errEl.textContent = '"'+state.actor+'" is not an active Employee in the login directory. Ask Finance to add you under Login Settings.';
+      errWrap.style.display = "block";
+      return;
+    }
+    errWrap.style.display = "none";
     addExpense({
       buId: document.getElementById("empexp-bu").value,
       destinationId: document.getElementById("empexp-dest").value,
@@ -1448,6 +1806,11 @@
   (async function boot(){
     document.getElementById("main").style.opacity = "0.45";
     await initStore();
+    state.role = state.settings.defaultRole === "employee" ? "employee" : "finance";
+    var defaultUser = state.users.find(function(u){ return u.active && u.role === state.role; });
+    state.actor = defaultUser ? defaultUser.name : (state.role === "employee" ? (state.businessUnits[0] ? state.businessUnits[0].employees[0] : "Employee") : "Finance Team");
+    document.getElementById("roleSelect").value = state.role;
+    document.getElementById("actorInput").value = state.actor;
     document.getElementById("main").style.opacity = "1";
     renderAll();
   })();

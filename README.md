@@ -11,6 +11,8 @@ MVP1/MVP2 scope from the proposal:
 - A simple linear-regression spend forecast vs. budget
 - A full audit log of every decision and acknowledgement
 - A role switcher (Finance/BU Leader vs. Employee) that changes what's visible
+- A Project Master list for tracking each project's budget by Business Unit / Department
+- A Login Settings screen for sign-in defaults and a directory of named users allowed to sign in per role
 
 It's a single self-contained `index.html` — no build step, no dependencies.
 
