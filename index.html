@@ -870,7 +870,7 @@
 
   /* ============================== PERSISTENCE ============================== */
   var db = null;
-  var LOCAL_KEY = "expense360-console-v1";
+  var LOCAL_KEY = "expense360-console-v2"; // v2: adds projects/users/settings — bumped so pre-existing local caches reseed cleanly
 
   function loadLocal(){
     try { var raw = localStorage.getItem(LOCAL_KEY); return raw ? JSON.parse(raw) : null; } catch(e){ return null; }
@@ -923,9 +923,22 @@
           var projSnap = await db.collection("projects").get();
           var userSnap = await db.collection("users").get();
           var settingsSnap = await db.doc("meta/settings").get();
-          state.projects = projSnap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
-          state.users = userSnap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
-          state.settings = Object.assign({}, DEFAULT_SETTINGS, settingsSnap.exists ? settingsSnap.data() : {});
+          if (!settingsSnap.exists){
+            // This shared workspace was seeded before Project Master / Login Settings existed —
+            // backfill the master data once so it isn't stuck permanently empty.
+            state.projects = PROJECT_SEED.map(function(p){ return Object.assign({}, p); });
+            state.users = USER_SEED.map(function(u){ return Object.assign({}, u); });
+            state.settings = Object.assign({}, DEFAULT_SETTINGS);
+            var backfillWrites = [];
+            state.projects.forEach(function(p){ backfillWrites.push(db.collection("projects").doc(p.id).set(stripId(p))); });
+            state.users.forEach(function(u){ backfillWrites.push(db.collection("users").doc(u.id).set(stripId(u))); });
+            backfillWrites.push(db.doc("meta/settings").set(state.settings));
+            await Promise.all(backfillWrites);
+          } else {
+            state.projects = projSnap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
+            state.users = userSnap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
+            state.settings = Object.assign({}, DEFAULT_SETTINGS, settingsSnap.data());
+          }
         } else {
           freshSeed();
           await seedToDb();
