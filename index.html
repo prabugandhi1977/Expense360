@@ -497,6 +497,7 @@
       <form id="expenseForm" class="form-grid">
         <div class="field"><label for="exp-bu">Business Unit</label><select id="exp-bu"></select></div>
         <div class="field"><label for="exp-dest">Destination</label><select id="exp-dest"></select></div>
+        <div class="field"><label for="exp-project">Project</label><select id="exp-project"><option value="">No project / general</option></select></div>
         <div class="field"><label for="exp-cat">Category</label>
           <select id="exp-cat">
             <option>Lodging</option><option>Meals</option><option>Transport</option><option>Airfare</option><option>Other</option>
@@ -519,7 +520,7 @@
       </div>
       <div class="table-scroll">
         <table id="exp-table">
-          <thead><tr><th>Date</th><th>Business Unit</th><th>Employee</th><th>Destination</th><th>Category</th><th>Amount</th><th></th></tr></thead>
+          <thead><tr><th>Date</th><th>Business Unit</th><th>Project</th><th>Employee</th><th>Destination</th><th>Category</th><th>Amount</th><th></th></tr></thead>
           <tbody id="exp-tbody"></tbody>
         </table>
       </div>
@@ -622,6 +623,7 @@
       <form id="expenseFormEmp" class="form-grid">
         <div class="field"><label for="empexp-bu">Business Unit</label><select id="empexp-bu"></select></div>
         <div class="field"><label for="empexp-dest">Destination</label><select id="empexp-dest"></select></div>
+        <div class="field"><label for="empexp-project">Project</label><select id="empexp-project"><option value="">No project / general</option></select></div>
         <div class="field"><label for="empexp-cat">Category</label>
           <select id="empexp-cat"><option>Lodging</option><option>Meals</option><option>Transport</option><option>Airfare</option><option>Other</option></select>
         </div>
@@ -635,7 +637,7 @@
       <div class="card-head"><h3>My recent submissions</h3></div>
       <div class="table-scroll">
         <table id="myexp-table">
-          <thead><tr><th>Date</th><th>Destination</th><th>Category</th><th>Amount</th></tr></thead>
+          <thead><tr><th>Date</th><th>Project</th><th>Destination</th><th>Category</th><th>Amount</th></tr></thead>
           <tbody id="myexp-tbody"></tbody>
         </table>
       </div>
@@ -860,8 +862,10 @@
 
   function buMap(){ var m={}; state.businessUnits.forEach(function(b){ m[b.id]=b; }); return m; }
   function destMap(){ var m={}; state.destinations.forEach(function(d){ m[d.id]=d; }); return m; }
+  function projectMap(){ var m={}; state.projects.forEach(function(p){ m[p.id]=p; }); return m; }
   function buName(id){ var b=buMap()[id]; return b?b.name:"—"; }
   function destName(id){ var d=destMap()[id]; return d?(d.city+", "+d.country):"—"; }
+  function projectName(id){ var p=projectMap()[id]; return p?p.name:""; }
   function buColor(id){ var b=buMap()[id]; return SERIES[(b?b.colorSlot:0)%SERIES.length]; }
 
   /* ============================== PERSISTENCE ============================== */
@@ -1425,6 +1429,17 @@
     else { dot.className="sync-dot local"; label.textContent = "Connecting…"; }
   }
 
+  function fillProjectSelect(selectId, buSelectId){
+    var sel = document.getElementById(selectId); if (!sel) return;
+    var buEl = document.getElementById(buSelectId);
+    var buId = buEl ? buEl.value : "";
+    var current = sel.value;
+    var opts = state.projects.filter(function(p){ return !buId || p.buId === buId; });
+    sel.innerHTML = '<option value="">No project / general</option>' +
+      opts.map(function(p){ return '<option value="'+p.id+'">'+esc(p.name)+'</option>'; }).join("");
+    if (current && opts.some(function(p){ return p.id === current; })) sel.value = current;
+  }
+
   function fillDestinationSelects(){
     ["exp-dest","empexp-dest"].forEach(function(id){
       var el = document.getElementById(id); if (!el) return;
@@ -1438,6 +1453,8 @@
       el.innerHTML = state.businessUnits.map(function(b){ return '<option value="'+b.id+'">'+esc(b.name)+'</option>'; }).join("");
       if (current) el.value = current;
     });
+    fillProjectSelect("exp-project", "exp-bu");
+    fillProjectSelect("empexp-project", "empexp-bu");
     var filterBu = document.getElementById("exp-filter-bu");
     if (filterBu && filterBu.options.length <= 1){
       filterBu.innerHTML += state.businessUnits.map(function(b){ return '<option value="'+b.id+'">'+esc(b.name)+'</option>'; }).join("");
@@ -1619,10 +1636,11 @@
       .slice().sort(function(a,b){ return new Date(b.date)-new Date(a.date); }).slice(0,120);
     document.getElementById("exp-tbody").innerHTML = rows.length ? rows.map(function(e){
       var anomaly = flagged[e.id];
-      return '<tr><td>'+e.date+'</td><td>'+esc(buName(e.buId))+'</td><td>'+esc(e.employee)+'</td><td>'+esc(destName(e.destinationId))+'</td><td>'+esc(e.category)+'</td>'+
+      var proj = projectName(e.projectId);
+      return '<tr><td>'+e.date+'</td><td>'+esc(buName(e.buId))+'</td><td>'+(proj?esc(proj):'<span class="hint">—</span>')+'</td><td>'+esc(e.employee)+'</td><td>'+esc(destName(e.destinationId))+'</td><td>'+esc(e.category)+'</td>'+
         '<td class="num">'+money(e.amount)+'</td>'+
         '<td>'+(anomaly? statusChip("serious","Anomaly") : '')+'</td></tr>';
-    }).join("") : '<tr><td colspan="7"><div class="empty">No transactions match this filter.</div></td></tr>';
+    }).join("") : '<tr><td colspan="8"><div class="empty">No transactions match this filter.</div></td></tr>';
   }
 
   function renderForecastView(){
@@ -1661,8 +1679,9 @@
     var mine = state.expenses.filter(function(e){ return e.submittedBy === state.actor; })
       .slice().sort(function(a,b){ return new Date(b.date)-new Date(a.date); }).slice(0,20);
     document.getElementById("myexp-tbody").innerHTML = mine.length ? mine.map(function(e){
-      return '<tr><td>'+e.date+'</td><td>'+esc(destName(e.destinationId))+'</td><td>'+esc(e.category)+'</td><td class="num">'+money(e.amount)+'</td></tr>';
-    }).join("") : '<tr><td colspan="4"><div class="empty">No submissions yet under this name.</div></td></tr>';
+      var proj = projectName(e.projectId);
+      return '<tr><td>'+e.date+'</td><td>'+(proj?esc(proj):'<span class="hint">—</span>')+'</td><td>'+esc(destName(e.destinationId))+'</td><td>'+esc(e.category)+'</td><td class="num">'+money(e.amount)+'</td></tr>';
+    }).join("") : '<tr><td colspan="5"><div class="empty">No submissions yet under this name.</div></td></tr>';
   }
 
   function renderProjectsView(){
@@ -1867,11 +1886,15 @@
     updateActorWarn();
   });
 
+  document.getElementById("exp-bu").addEventListener("change", function(){ fillProjectSelect("exp-project", "exp-bu"); });
+  document.getElementById("empexp-bu").addEventListener("change", function(){ fillProjectSelect("empexp-project", "empexp-bu"); });
+
   document.getElementById("expenseForm").addEventListener("submit", function(e){
     e.preventDefault();
     addExpense({
       buId: document.getElementById("exp-bu").value,
       destinationId: document.getElementById("exp-dest").value,
+      projectId: document.getElementById("exp-project").value,
       category: document.getElementById("exp-cat").value,
       amount: +document.getElementById("exp-amount").value,
       date: document.getElementById("exp-date").value || new Date().toISOString().slice(0,10),
@@ -1893,6 +1916,7 @@
     addExpense({
       buId: document.getElementById("empexp-bu").value,
       destinationId: document.getElementById("empexp-dest").value,
+      projectId: document.getElementById("empexp-project").value,
       category: document.getElementById("empexp-cat").value,
       amount: +document.getElementById("empexp-amount").value,
       date: document.getElementById("empexp-date").value || new Date().toISOString().slice(0,10),
