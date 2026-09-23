@@ -1077,8 +1077,109 @@
     var id = await createRemote("expenses", data);
     data.id = id;
     state.expenses.unshift(data);
+    refreshPendingRecommendations([data.destinationId]);
+    refreshAutomatedAlerts();
     saveLocal();
     renderAll();
+  }
+
+  /* ============================== AI PIPELINE (per-diem optimization + alerts) ==============================
+     Runs on new expense/BU data (see addExpense above). Ingests actual lodging spend for a destination,
+     enriches it with the destination's external hotel-rate trend, and produces an updated recommended
+     range + confidence score. Only touches destinations still "pending" a Finance decision — an
+     approved/rejected/overridden per-diem is a recorded human decision and is left alone here. */
+  function computeRecommendation(dest){
+    var rows = state.expenses.filter(function(e){ return e.destinationId === dest.id && e.category === "Lodging"; });
+    var tripCount = rows.length;
+    var mean = tripCount ? rows.reduce(function(s,r){ return s+r.amount; },0) / tripCount : 0;
+    var variance = tripCount ? rows.reduce(function(s,r){ return s+Math.pow(r.amount-mean,2); },0) / tripCount : 0;
+    var cv = mean ? Math.sqrt(variance) / mean : 0; // coefficient of variation: lower = more consistent spend
+
+    var trend = dest.hotelTrend || [];
+    var trendPct = trend.length > 1 ? ((trend[trend.length-1]-trend[0]) / trend[0]) * 100 : 0;
+
+    // Blend actual spend (ingest) with the destination's market rate trend (enrich).
+    var target = mean ? mean * (1 + (trendPct/100)*0.35) : dest.currentPerDiem;
+    var low = Math.max(1, Math.round(target*0.95));
+    var high = Math.max(low+1, Math.round(target*1.08));
+
+    var confidence = Math.round(50 + Math.min(30, tripCount*3) - Math.min(30, cv*60));
+    confidence = Math.max(35, Math.min(95, confidence));
+
+    var overCount = rows.filter(function(r){ return r.amount > dest.currentPerDiem; }).length;
+    var overShare = tripCount ? Math.round((overCount/tripCount)*100) : 0;
+
+    var rationale = [];
+    rationale.push(tripCount >= 3
+      ? "Actual lodging spend has run "+(mean>dest.currentPerDiem?"above":"at or below")+" the current "+money(dest.currentPerDiem)+" per-diem in "+overShare+"% of the last "+tripCount+" tracked stays (avg "+money(mean)+")."
+      : "Only "+tripCount+" tracked stay(s) for this destination so far — the recommendation will sharpen as more trips are logged.");
+    rationale.push("Destination hotel rates have moved "+(trendPct>=0?"up":"down")+" "+Math.abs(Math.round(trendPct))+"% over the tracked trend window.");
+    rationale.push("Confidence reflects "+tripCount+" data point(s) and "+(cv<0.15?"low":"moderate-to-high")+" spend variance.");
+
+    return { recommendedLow:low, recommendedHigh:high, confidence:confidence, rationale:rationale };
+  }
+
+  function refreshPendingRecommendations(destIds){
+    var ids = destIds || state.destinations.filter(function(d){ return d.status === "pending"; }).map(function(d){ return d.id; });
+    ids.forEach(function(id){
+      var dest = destMap()[id];
+      if (!dest || dest.status !== "pending") return;
+      var rec = computeRecommendation(dest);
+      Object.assign(dest, rec);
+      persist("destinations", "update", dest.id, rec);
+    });
+  }
+
+  function upsertAlert(id, data){
+    var existing = state.alerts.find(function(a){ return a.id === id; });
+    if (existing){
+      if (existing.acknowledged) return; // a dismissed alert stays dismissed until the underlying signal is re-acknowledged
+      Object.assign(existing, data);
+      if (state.dbMode === "db" && db){ try { db.collection("alerts").doc(id).update(data); } catch(e){ console.warn(e); } }
+    } else {
+      var entry = Object.assign({ id:id, acknowledged:false, createdAt:new Date().toISOString() }, data);
+      state.alerts.unshift(entry);
+      if (state.dbMode === "db" && db){ try { db.collection("alerts").doc(id).set(stripId(entry)); } catch(e){ console.warn(e); } }
+    }
+  }
+
+  function refreshAutomatedAlerts(){
+    // Budget vs. actual: projected annual run-rate per Business Unit.
+    state.businessUnits.forEach(function(b){
+      var monthly = monthlyTotals(b.id).filter(function(m){ return m.y > 0; });
+      if (!monthly.length) return;
+      var avgMonthly = monthly.reduce(function(s,m){ return s+m.y; },0) / monthly.length;
+      var ratio = b.annualBudget ? (avgMonthly*12) / b.annualBudget : 0;
+      if (ratio > 1.03){
+        upsertAlert("auto-overrun-"+b.id, {
+          type:"budget_overrun_risk", severity: ratio>1.15 ? "critical" : "warning", buId:b.id,
+          message: b.name+" is projected to exceed its annual T&E budget by ~"+Math.round((ratio-1)*100)+"% at the current run-rate."
+        });
+      }
+    });
+
+    // Per-diem deviation: destinations still pending a decision, where most tracked stays exceed policy.
+    state.destinations.filter(function(d){ return d.status === "pending"; }).forEach(function(dest){
+      var rows = state.expenses.filter(function(e){ return e.destinationId === dest.id && e.category === "Lodging"; });
+      if (rows.length < 4) return;
+      var overCount = rows.filter(function(r){ return r.amount > dest.currentPerDiem; }).length;
+      if (overCount / rows.length >= 0.6){
+        upsertAlert("auto-perdiem-"+dest.id, {
+          type:"perdiem_deviation", severity:"warning", buId:null,
+          message: overCount+" of the last "+rows.length+" "+dest.city+" stays exceeded the current "+money(dest.currentPerDiem)+" per-diem."
+        });
+      }
+    });
+
+    // Unusual spend increases: newly detected statistical outliers.
+    var flagged = anomalyIds();
+    Object.keys(flagged).forEach(function(expId){
+      var exp = state.expenses.find(function(e){ return e.id === expId; }); if (!exp) return;
+      upsertAlert("auto-anomaly-"+expId, {
+        type:"unusual_spend_increase", severity:"serious", buId: exp.buId,
+        message: buName(exp.buId)+"'s "+exp.category.toLowerCase()+" spend in "+destName(exp.destinationId)+" ("+money(exp.amount)+") is a statistical outlier for that destination/category."
+      });
+    });
   }
 
   /* ============================== ANOMALY DETECTION ============================== */

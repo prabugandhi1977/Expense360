@@ -31,3 +31,11 @@ of `localStorage`, so changes are visible to everyone who opens it.)
   demo, not a trained ML model.
 - Sample data (Business Units, destinations, ~450 seeded transactions) loads
   automatically on first run.
+- The per-diem recommendations and budget/anomaly alerts aren't static: every
+  time a new expense is logged, the engine re-ingests that destination's
+  actual lodging spend, re-blends it with the destination's hotel-rate trend,
+  and recomputes the recommended range, confidence score and rationale for
+  any per-diem still pending a Finance decision — plus re-scans all Business
+  Units for projected budget overruns, per-diem deviations and spend
+  anomalies. A per-diem already Approved/Rejected/Overridden is a recorded
+  human decision and is left untouched by this refresh.
