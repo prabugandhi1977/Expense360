@@ -1,0 +1,172 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Expense360 Video</title>
+<link rel="stylesheet" href="../fonts/fonts.css">
+<style>
+  :root{ --ink:#142420; --ink2:#48564F; --bg:#E9E9E7; --teal:#1B6E67; --deep:#0E4B46; --deeper:#082F2C; --gold:#D4A24C; --goldsoft:#F5EBD6; }
+  *{ box-sizing:border-box; margin:0; }
+  html,body{ width:1920px; height:1080px; overflow:hidden; background:var(--deeper); }
+  body{ font-family:'IBM Plex Sans',sans-serif; color:var(--ink); }
+  .scene{ position:absolute; inset:0; opacity:0; overflow:hidden; }
+  .dark{ background:radial-gradient(1200px 800px at 70% 30%, #13605A 0%, var(--deep) 45%, var(--deeper) 100%); color:#fff; }
+  .light{ background:var(--bg); }
+  .serif{ font-family:'Fraunces',serif; }
+  .a{ will-change:transform,opacity; }
+  .center{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; }
+  .h-xl{ font-family:'Fraunces',serif; font-weight:600; font-size:104px; line-height:1.05; letter-spacing:-0.02em; }
+  .h-l{ font-family:'Fraunces',serif; font-weight:600; font-size:76px; line-height:1.08; letter-spacing:-0.015em; }
+  .gold{ color:var(--gold); }
+  .kicker{ font-weight:600; font-size:24px; letter-spacing:.2em; text-transform:uppercase; color:var(--gold); }
+  /* problem cards */
+  .cards{ display:flex; gap:36px; margin-top:64px; }
+  .card{ width:470px; padding:40px 40px 44px; border-radius:24px; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.14); text-align:left; }
+  .card .n{ font-family:'IBM Plex Mono',monospace; font-size:22px; color:var(--gold); margin-bottom:22px; }
+  .card .t{ font-family:'Fraunces',serif; font-size:40px; line-height:1.15; font-weight:600; }
+  /* logo */
+  .logo{ font-family:'Fraunces',serif; font-weight:700; font-size:180px; letter-spacing:-0.02em; }
+  .logo em{ font-style:normal; color:var(--gold); }
+  .tag{ font-size:40px; color:rgba(255,255,255,.82); margin-top:18px; }
+  .ring{ position:absolute; left:50%; top:50%; border-radius:50%; border:2px solid rgba(212,162,76,.5); transform:translate(-50%,-50%); }
+  /* product scenes */
+  .cap{ position:absolute; left:110px; top:0; bottom:0; width:520px; display:flex; flex-direction:column; justify-content:center; }
+  .cap .num{ font-family:'IBM Plex Mono',monospace; font-size:26px; font-weight:600; color:var(--teal); margin-bottom:26px; }
+  .cap h2{ font-family:'Fraunces',serif; font-weight:600; font-size:72px; line-height:1.04; letter-spacing:-0.015em; margin-bottom:30px; }
+  .cap p{ font-size:31px; line-height:1.42; color:var(--ink2); }
+  .frame{ position:absolute; left:690px; top:150px; width:1230px; height:800px; border-radius:22px 0 0 22px; background:#fff; box-shadow:0 40px 90px rgba(14,75,70,.22), 0 6px 18px rgba(14,75,70,.10); overflow:hidden; }
+  .chrome{ height:44px; background:#F4F4F2; border-bottom:1px solid #DDD; display:flex; align-items:center; padding:0 20px; gap:9px; }
+  .chrome i{ width:13px; height:13px; border-radius:50%; background:#D6D6D2; display:block; }
+  .chrome .url{ margin-left:22px; height:26px; border-radius:13px; background:#fff; border:1px solid #E1E1DD; flex:0 0 520px; font-size:14px; color:#7A857F; display:flex; align-items:center; padding:0 14px; font-family:'IBM Plex Mono',monospace; }
+  .viewport{ position:absolute; left:0; right:0; top:44px; bottom:0; overflow:hidden; }
+  .shot{ position:absolute; left:0; top:0; width:1280px; height:800px; transform-origin:0 0; }
+  .shot img{ width:100%; height:100%; display:block; }
+  .hl{ position:absolute; border:4px solid var(--gold); border-radius:14px; box-shadow:0 0 0 9999px rgba(8,47,44,.0); }
+  .progress{ position:absolute; left:110px; bottom:80px; display:flex; gap:10px; }
+  .progress b{ display:block; width:44px; height:5px; border-radius:3px; background:rgba(20,36,32,.14); }
+  .progress b.on{ background:var(--teal); }
+  /* CTA */
+  .pillars{ display:flex; gap:26px; margin-bottom:70px; }
+  .pill{ font-family:'Fraunces',serif; font-size:54px; font-weight:600; }
+  .pill .dot{ color:var(--gold); }
+  .url-big{ margin-top:40px; font-family:'IBM Plex Mono',monospace; font-size:38px; padding:20px 38px; border-radius:60px; background:var(--gold); color:var(--deeper); font-weight:600; }
+</style></head>
+<body>
+
+<!-- 1: hook -->
+<section class="scene dark" id="s1" data-s="0" data-e="4.6">
+  <div class="center">
+    <div class="h-xl a" data-in="0.3">Travel costs move every month.</div>
+    <div class="h-xl gold a" data-in="1.5" style="margin-top:22px">Your per-diem policy doesn't.</div>
+  </div>
+</section>
+
+<!-- 2: problems -->
+<section class="scene dark" id="s2" data-s="4.6" data-e="10">
+  <div class="center">
+    <div class="kicker a" data-in="0.2">The status quo</div>
+    <div class="cards">
+      <div class="card a" data-in="0.6"><div class="n">01</div><div class="t">Per-diems set once a year — and left to go stale</div></div>
+      <div class="card a" data-in="1.2"><div class="n">02</div><div class="t">Budget overruns found at quarter-end, not before</div></div>
+      <div class="card a" data-in="1.8"><div class="n">03</div><div class="t">Outlier spend buried in thousands of line items</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 3: logo -->
+<section class="scene dark" id="s3" data-s="10" data-e="14.4">
+  <div class="ring" id="ring1"></div><div class="ring" id="ring2"></div>
+  <div class="center">
+    <div class="kicker a" data-in="0.2">Introducing</div>
+    <div class="logo a" data-in="0.5" data-scale="1">Expense<em>360</em></div>
+    <div class="tag a" data-in="1.3">Intelligent expense &amp; budget optimization</div>
+  </div>
+</section>
+
+<!-- product scenes -->
+<section class="scene light prod" data-s="14.4" data-e="20.2" data-img="overview" data-z="1,1.28" data-f="0.06,0.1" data-hl="10.4,27,79.1,13.2" data-hlin="2.0" data-idx="0">
+  <div class="cap"><div class="num a" data-in="0.3">01 — Executive overview</div><h2 class="a" data-in="0.5">See every dollar at a glance</h2><p class="a" data-in="0.8">Spend, budget health and open risks across every Business Unit, in one view.</p></div>
+</section>
+<section class="scene light prod" data-s="20.2" data-e="27" data-img="perdiem-drawer" data-z="1,1.6" data-f="1,0.3" data-hl="71.6,36,27.6,22.4" data-hlin="2.4" data-idx="1">
+  <div class="cap"><div class="num a" data-in="0.3">02 — Per-diem optimization</div><h2 class="a" data-in="0.5">Per-diems that keep up with reality</h2><p class="a" data-in="0.8">Recommended ranges by destination from actual spend and hotel-rate trends, with a confidence score and the reasons behind it.</p></div>
+</section>
+<section class="scene light prod" data-s="27" data-e="32.6" data-img="budgets" data-z="1,1.3" data-f="0.12,0.5" data-hl="11.2,50.6,77.6,6.8" data-hlin="1.9" data-idx="2">
+  <div class="cap"><div class="num a" data-in="0.3">03 — Budgets &amp; alerts</div><h2 class="a" data-in="0.5">Catch overruns before they happen</h2><p class="a" data-in="0.8">Alerts for projected overruns, per-diem drift, cost shifts and unusual spend, by Business Unit.</p></div>
+</section>
+<section class="scene light prod" data-s="32.6" data-e="38" data-img="forecast" data-z="1,1.3" data-f="0.7,0.5" data-hl="57,54,32,20" data-hlin="2.0" data-idx="3">
+  <div class="cap"><div class="num a" data-in="0.3">04 — Forecast &amp; variance</div><h2 class="a" data-in="0.5">Know where spend is heading</h2><p class="a" data-in="0.8">Trend projections against budget, org-wide or for any single Business Unit.</p></div>
+</section>
+<section class="scene light prod" data-s="38" data-e="43.6" data-img="submit" data-z="1,1.3" data-f="0.1,0.2" data-hl="11,25.8,78,8.6" data-hlin="1.8" data-idx="4">
+  <div class="cap"><div class="num a" data-in="0.3">05 — Receipt scanning</div><h2 class="a" data-in="0.5">Snap a receipt. Skip the typing.</h2><p class="a" data-in="0.8">OCR fills in amount, date, category and bill number for employees to check before they submit.</p></div>
+</section>
+<section class="scene light prod" data-s="43.6" data-e="49.2" data-img="audit" data-z="1,1.45" data-f="0.1,0.2" data-hl="10.2,25.8,79.8,27" data-hlin="1.8" data-idx="5">
+  <div class="cap"><div class="num a" data-in="0.3">06 — Audit log</div><h2 class="a" data-in="0.5">People decide. Every decision is logged.</h2><p class="a" data-in="0.8">Approve, reject or override any recommendation. Each action is recorded for governance.</p></div>
+</section>
+
+<!-- CTA -->
+<section class="scene dark" id="s10" data-s="49.2" data-e="56">
+  <div class="center">
+    <div class="pillars">
+      <div class="pill a" data-in="0.2">Collect<span class="dot">.</span></div>
+      <div class="pill a" data-in="0.5">Analyze<span class="dot">.</span></div>
+      <div class="pill a" data-in="0.8">Predict<span class="dot">.</span></div>
+      <div class="pill a" data-in="1.1">Recommend<span class="dot">.</span></div>
+    </div>
+    <div class="logo a" data-in="1.8" style="font-size:150px">Expense<em>360</em></div>
+    <div class="url-big a" data-in="2.6">prabugandhi1977.github.io/Expense360</div>
+  </div>
+</section>
+
+<script>
+const clamp=(x,a=0,b=1)=>Math.max(a,Math.min(b,x));
+const eo=x=>1-Math.pow(1-clamp(x),3);            // easeOutCubic
+const eio=x=>{x=clamp(x);return x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2;};
+const FADE=0.45;
+const scenes=[...document.querySelectorAll('.scene')];
+
+// build product frames
+document.querySelectorAll('.prod').forEach(s=>{
+  const [l,t,w,h]=s.dataset.hl.split(',').map(Number);
+  s.insertAdjacentHTML('beforeend',
+    `<div class="frame a" data-in="0.1" data-dx="80"><div class="chrome"><i></i><i></i><i></i><div class="url">prabugandhi1977.github.io/Expense360</div></div>
+     <div class="viewport"><div class="shot"><img src="../assets/${s.dataset.img}.png">
+     <div class="hl" style="left:${l}%;top:${t}%;width:${w}%;height:${h}%"></div></div></div></div>
+     <div class="progress">${[0,1,2,3,4,5].map(i=>`<b class="${i<=+s.dataset.idx?'on':''}"></b>`).join('')}</div>`);
+});
+
+function render(t){
+  for(const s of scenes){
+    const st=+s.dataset.s, en=+s.dataset.e, lt=t-st, d=en-st;
+    const vis = t>=st-0.001 && t<en+FADE;
+    if(!vis){ s.style.opacity=0; s.style.display='none'; continue; }
+    s.style.display='block';
+    // crossfade: fade in over FADE at start (except first), out over FADE after end
+    let op = st===0 ? 1 : clamp(lt/FADE);
+    if(lt>d) op = 1-clamp((lt-d)/FADE);
+    s.style.opacity=op;
+    s.style.zIndex = lt>d ? 1 : 2;
+    s.querySelectorAll('.a').forEach(el=>{
+      const k=eo((lt-(+el.dataset.in||0))/0.8);
+      const dx=+(el.dataset.dx||0);
+      el.style.opacity=k;
+      el.style.transform = el.dataset.scale ? `scale(${0.9+0.1*k})` : `translate(${dx*(1-k)}px,${dx?0:34*(1-k)}px)`;
+    });
+    if(s.classList.contains('prod')){
+      const [z0,z1]=s.dataset.z.split(',').map(Number), [fx,fy]=s.dataset.f.split(',').map(Number);
+      const k=eio(clamp((lt-0.9)/(d-1.2)));
+      const z=z0+(z1-z0)*k, W=1230, H=756;
+      const sw=1280*z, sh=800*z;
+      const shot=s.querySelector('.shot');
+      shot.style.transform=`translate(${Math.min(0,-(sw-W)*fx)}px,${Math.min(0,-(sh-H)*fy)}px) scale(${z})`;
+      const hl=s.querySelector('.hl'), hk=eo((lt-+s.dataset.hlin)/0.6);
+      hl.style.opacity=hk; hl.style.transform=`scale(${1.06-0.06*hk})`;
+    }
+  }
+  // logo rings
+  const r=t-10;
+  [['ring1',0.3],['ring2',0.8]].forEach(([id,dl])=>{
+    const k=eo((r-dl)/2.4), el=document.getElementById(id);
+    const sz=500+900*k; el.style.width=el.style.height=sz+'px'; el.style.opacity=(1-k)*0.9;
+  });
+}
+window.DURATION=56.4;
+render(0);
+</script>
+</body></html>
