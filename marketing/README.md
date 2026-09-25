@@ -2,9 +2,9 @@
 
 | File | What it is |
 |---|---|
-| `Expense360-promo.mp4` | 56-second promo, 1920×1080, H.264 with a soft synthesized music bed |
+| `Expense360-promo.mp4` | 67-second promo, 1920×1080, H.264 with a soft synthesized music bed |
 | `Expense360-promo-720p-silent.mp4` | 1280×720 silent cut for autoplay embeds and social feeds |
-| `assets/*.png` | Retina screenshots of every app screen (2880×1800), taken from `index.html` with its sample data |
+| `assets/*.png` | Retina screenshots of every app screen (2880×1800), taken from `index.html` with its sample data (signed in as "Finance Team" and "Ankita Bansal"), plus the login screen and a dark-theme overview |
 
 The pitch deck lives as a Claude Slides artifact; it can be downloaded from there as PPTX or PDF.
 
@@ -16,12 +16,14 @@ The pitch deck lives as a Claude Slides artifact; it can be downloaded from ther
 | 0:05 | Status quo — stale per-diems, late overrun discovery, hidden outliers |
 | 0:10 | Logo reveal — Expense360, intelligent expense & budget optimization |
 | 0:14 | 01 Executive overview |
-| 0:20 | 02 Per-diem optimization (recommendation + reasons) |
-| 0:27 | 03 Budgets & alerts |
-| 0:33 | 04 Forecast & variance |
-| 0:38 | 05 Receipt scanning |
-| 0:44 | 06 Audit log / human-in-the-loop |
-| 0:49 | CTA — Collect. Analyze. Predict. Recommend. + demo URL |
+| 0:20 | 02 Action digest |
+| 0:26 | 03 Per-diem optimization (recommendation + reasons) |
+| 0:32 | 04 Budgets & alerts |
+| 0:38 | 05 Forecast & variance |
+| 0:43 | 06 Policy assistant |
+| 0:49 | 07 Smart receipts (OCR, translation, itemized, duplicates) |
+| 0:54 | 08 Audit log / human-in-the-loop |
+| 1:00 | CTA — Collect. Analyze. Predict. Recommend. + demo URL |
 
 ## Re-rendering
 
