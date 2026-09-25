@@ -28,7 +28,9 @@ MVP1/MVP2 scope from the proposal:
 - A name-based sign-in screen: pick or type your name (auto-matched against
   the Login Directory for its role), sign in, and sign out from the top bar.
   No password — it's a demo — and enforcement of the Login Directory is
-  optional (the "require known user" setting under Login Settings)
+  optional (the "require known user" setting under Login Settings). "New
+  here? Create an account" on the same screen self-registers a name/role/
+  Business Unit into the Login Directory and signs straight in.
 - A Policy Assistant chat, open to both roles: keyword-matched Q&A over a
   small T&E policy knowledge base, plus two live lookups — per-diem for a
   named destination, and budget/spend for a named Business Unit — read

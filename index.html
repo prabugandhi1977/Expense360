@@ -365,7 +365,7 @@
 <div class="login-screen" id="loginScreen" hidden>
   <div class="login-card">
     <div class="brand" style="justify-content:center;"><span class="brand-mark">Expense<em>360</em></span></div>
-    <p class="login-tagline">Sign in to continue</p>
+    <p class="login-tagline" id="loginModeLabel">Sign in to continue</p>
     <form id="loginForm">
       <div class="field">
         <label for="login-name">Your name</label>
@@ -379,10 +379,16 @@
           <option value="employee">Employee</option>
         </select>
       </div>
+      <div class="field" id="signup-bu-wrap" style="display:none; margin-top:12px;">
+        <label for="signup-bu">Your Business Unit (optional for Finance)</label>
+        <select id="signup-bu"><option value="">No specific Business Unit</option></select>
+      </div>
       <div id="login-error" class="hint" style="color:var(--status-critical); display:none; margin-top:10px;"></div>
-      <button class="btn btn-primary" type="submit" style="width:100%; justify-content:center; margin-top:16px;">Sign in</button>
+      <button class="btn btn-primary" type="submit" id="loginSubmitBtn" style="width:100%; justify-content:center; margin-top:16px;">Sign in</button>
+      <button type="button" class="btn btn-ghost btn-sm" id="loginToggleSignup" style="width:100%; justify-content:center; margin-top:8px;">New here? Create an account</button>
     </form>
-    <p class="login-footnote">Demo sign-in — no password. Ask Finance to add your name under Login Settings if it isn't recognized.</p>
+    <p class="login-footnote">Demo sign-in — no password. If your name isn't recognized and "require known user" is on for this workspace, use "Create an account" above.</p>
+    <p class="hint" id="loginDiag" style="text-align:center; margin-top:10px;">Loading…</p>
   </div>
 </div>
 
@@ -2840,6 +2846,20 @@
     try { sessionStorage.setItem(SESSION_KEY, JSON.stringify({ actor: state.actor, role: state.role })); } catch(e){}
   }
 
+  var signupMode = false;
+  function setSignupMode(on){
+    signupMode = on;
+    document.getElementById("signup-bu-wrap").style.display = on ? "block" : "none";
+    document.getElementById("loginSubmitBtn").textContent = on ? "Create account & sign in" : "Sign in";
+    document.getElementById("loginToggleSignup").textContent = on ? "Already have an account? Sign in" : "New here? Create an account";
+    document.getElementById("loginModeLabel").textContent = on ? "Create your account" : "Sign in to continue";
+    if (on){
+      var sel = document.getElementById("signup-bu");
+      sel.innerHTML = '<option value="">No specific Business Unit</option>' +
+        state.businessUnits.map(function(b){ return '<option value="'+b.id+'">'+esc(b.name)+'</option>'; }).join("");
+    }
+  }
+
   function showLoginScreen(){
     document.getElementById("appShell").hidden = true;
     document.getElementById("loginScreen").hidden = false;
@@ -2849,9 +2869,12 @@
       document.getElementById("login-role").value = (state.settings && state.settings.defaultRole === "employee") ? "employee" : "finance";
       document.getElementById("login-name").value = "";
       document.getElementById("login-error").style.display = "none";
+      setSignupMode(false);
       document.getElementById("login-name").focus();
+      document.getElementById("loginDiag").textContent = "App loaded OK (" + state.dbMode + " mode) — waiting for sign-in.";
     } catch(e){
       console.error("showLoginScreen failed to populate directory list", e);
+      document.getElementById("loginDiag").textContent = "App loaded with a warning: " + (e && e.message ? e.message : e) + " — the form below should still work.";
       // the form itself is already visible and usable even if the name-suggestions list failed to fill in
     }
   }
@@ -2877,9 +2900,15 @@
   }
 
   document.getElementById("login-name").addEventListener("input", function(e){
+    if (signupMode) return;
     var name = e.target.value.trim().toLowerCase();
     var match = state.users.find(function(u){ return u.active && u.name.trim().toLowerCase() === name; });
     if (match) document.getElementById("login-role").value = match.role;
+  });
+
+  document.getElementById("loginToggleSignup").addEventListener("click", function(){
+    setSignupMode(!signupMode);
+    document.getElementById("login-error").style.display = "none";
   });
 
   document.getElementById("loginForm").addEventListener("submit", function(e){
@@ -2889,8 +2918,23 @@
       var name = document.getElementById("login-name").value.trim();
       var role = document.getElementById("login-role").value;
       if (!name){ errEl.textContent = "Enter your name to continue."; errEl.style.display = "block"; return; }
+
+      if (signupMode){
+        if (isKnownActiveUser(name, role)){
+          errEl.textContent = '"'+name+'" is already registered for that role — switch to "Sign in" instead.';
+          errEl.style.display = "block";
+          return;
+        }
+        var buId = document.getElementById("signup-bu").value;
+        var newUser = addRecord("users", "users", { name:name, role:role, buId:buId, active:true });
+        pushAudit("Self-registered via sign-in screen", name, (role==="finance"?"Finance / BU Leader":"Employee")+(buId?" · "+buName(buId):"")+".");
+        errEl.style.display = "none";
+        enterApp(newUser.name, newUser.role);
+        return;
+      }
+
       if (state.settings.requireKnownUser && !isKnownActiveUser(name, role)){
-        errEl.textContent = '"'+name+'" is not an active user for that role in the Login Directory. Ask Finance to add you under Login Settings, or pick the role you\'re actually signing in as.';
+        errEl.textContent = '"'+name+'" is not an active user for that role in the Login Directory. Ask Finance to add you under Login Settings, or use "Create an account" below.';
         errEl.style.display = "block";
         return;
       }
@@ -2931,6 +2975,7 @@
       var errEl = document.getElementById("login-error");
       errEl.textContent = "Startup hit an error and fell back to a fresh local demo: " + (err && err.message ? err.message : err) + ". You can still sign in below.";
       errEl.style.display = "block";
+      document.getElementById("loginDiag").textContent = "Startup error (see message above) — recovered with a fresh local demo.";
     }
   })();
 
