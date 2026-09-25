@@ -2842,15 +2842,18 @@
 
   function showLoginScreen(){
     document.getElementById("appShell").hidden = true;
-    var loginScreen = document.getElementById("loginScreen");
-    loginScreen.hidden = false;
-
-    document.getElementById("login-name-list").innerHTML = state.users.filter(function(u){ return u.active; })
-      .map(function(u){ return '<option value="'+esc(u.name)+'">'; }).join("");
-    document.getElementById("login-role").value = state.settings.defaultRole === "employee" ? "employee" : "finance";
-    document.getElementById("login-name").value = "";
-    document.getElementById("login-error").style.display = "none";
-    document.getElementById("login-name").focus();
+    document.getElementById("loginScreen").hidden = false;
+    try {
+      document.getElementById("login-name-list").innerHTML = (state.users || []).filter(function(u){ return u.active; })
+        .map(function(u){ return '<option value="'+esc(u.name)+'">'; }).join("");
+      document.getElementById("login-role").value = (state.settings && state.settings.defaultRole === "employee") ? "employee" : "finance";
+      document.getElementById("login-name").value = "";
+      document.getElementById("login-error").style.display = "none";
+      document.getElementById("login-name").focus();
+    } catch(e){
+      console.error("showLoginScreen failed to populate directory list", e);
+      // the form itself is already visible and usable even if the name-suggestions list failed to fill in
+    }
   }
 
   function enterApp(actor, role){
@@ -2860,8 +2863,17 @@
     document.getElementById("loginScreen").hidden = true;
     document.getElementById("appShell").hidden = false;
     document.getElementById("main").style.opacity = "1";
-    persistSession();
-    renderAll();
+    try { persistSession(); } catch(e){ console.warn("persistSession failed", e); }
+    try {
+      renderAll();
+    } catch(e){
+      console.error("renderAll failed after sign-in", e);
+      document.getElementById("loginScreen").hidden = false;
+      document.getElementById("appShell").hidden = true;
+      var errEl = document.getElementById("login-error");
+      errEl.textContent = "Something went wrong loading the app after sign-in: " + (e && e.message ? e.message : e) + ". Try refreshing the page; if it keeps happening, note this message down.";
+      errEl.style.display = "block";
+    }
   }
 
   document.getElementById("login-name").addEventListener("input", function(e){
@@ -2872,17 +2884,23 @@
 
   document.getElementById("loginForm").addEventListener("submit", function(e){
     e.preventDefault();
-    var name = document.getElementById("login-name").value.trim();
-    var role = document.getElementById("login-role").value;
     var errEl = document.getElementById("login-error");
-    if (!name){ errEl.textContent = "Enter your name to continue."; errEl.style.display = "block"; return; }
-    if (state.settings.requireKnownUser && !isKnownActiveUser(name, role)){
-      errEl.textContent = '"'+name+'" is not an active user for that role in the Login Directory. Ask Finance to add you under Login Settings, or pick the role you\'re actually signing in as.';
+    try {
+      var name = document.getElementById("login-name").value.trim();
+      var role = document.getElementById("login-role").value;
+      if (!name){ errEl.textContent = "Enter your name to continue."; errEl.style.display = "block"; return; }
+      if (state.settings.requireKnownUser && !isKnownActiveUser(name, role)){
+        errEl.textContent = '"'+name+'" is not an active user for that role in the Login Directory. Ask Finance to add you under Login Settings, or pick the role you\'re actually signing in as.';
+        errEl.style.display = "block";
+        return;
+      }
+      errEl.style.display = "none";
+      enterApp(name, role);
+    } catch(err){
+      console.error("sign-in failed", err);
+      errEl.textContent = "Sign-in failed: " + (err && err.message ? err.message : err) + ". Try refreshing the page; if it keeps happening, note this message down.";
       errEl.style.display = "block";
-      return;
     }
-    errEl.style.display = "none";
-    enterApp(name, role);
   });
 
   document.getElementById("signOutBtn").addEventListener("click", function(){
@@ -2893,16 +2911,26 @@
   /* ============================== BOOT ============================== */
   (async function boot(){
     document.getElementById("main").style.opacity = "0.45";
-    await initStore();
-    loadLiveFxRates(); // fire-and-forget: fallback rates work immediately, live rates refine once loaded
+    try {
+      await initStore();
+      loadLiveFxRates(); // fire-and-forget: fallback rates work immediately, live rates refine once loaded
 
-    var restored = null;
-    try { restored = JSON.parse(sessionStorage.getItem(SESSION_KEY) || "null"); } catch(e){}
+      var restored = null;
+      try { restored = JSON.parse(sessionStorage.getItem(SESSION_KEY) || "null"); } catch(e){}
 
-    if (restored && restored.actor && restored.role){
-      enterApp(restored.actor, restored.role);
-    } else {
+      if (restored && restored.actor && restored.role){
+        enterApp(restored.actor, restored.role);
+      } else {
+        showLoginScreen();
+      }
+    } catch(err){
+      console.error("boot failed", err);
+      freshSeed();
+      state.dbMode = "local";
       showLoginScreen();
+      var errEl = document.getElementById("login-error");
+      errEl.textContent = "Startup hit an error and fell back to a fresh local demo: " + (err && err.message ? err.message : err) + ". You can still sign in below.";
+      errEl.style.display = "block";
     }
   })();
 
