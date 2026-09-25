@@ -139,6 +139,11 @@
 
   /* ============================== SHELL (left sidebar nav) ============================== */
   .app-shell{ display:flex; min-height:100vh; align-items:stretch; }
+  /* The bare [hidden] UA-stylesheet rule has no special priority and loses to the
+     display:flex rules above at equal specificity in some browsers — without this,
+     toggling .hidden via JS removes the attribute correctly but the element (in
+     particular the fixed, full-viewport login overlay) never actually disappears. */
+  .app-shell[hidden], .login-screen[hidden]{ display:none!important; }
 
   .sidebar{
     width:236px; flex:none; background:var(--surface); border-right:1px solid var(--border);
