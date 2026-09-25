@@ -123,6 +123,7 @@
 
   /* ============================== BASE ============================== */
   *{ box-sizing:border-box; }
+  html, body{ margin:0; padding:0; }
   body{
     background:var(--bg); color:var(--ink); font-family:var(--font-body);
     font-size:14.5px; line-height:1.5; -webkit-font-smoothing:antialiased;
@@ -136,18 +137,41 @@
   .num{ font-variant-numeric:tabular-nums; font-family:var(--font-mono); }
   @media (prefers-reduced-motion:reduce){ *{ animation:none!important; transition:none!important; } }
 
-  /* ============================== SHELL ============================== */
+  /* ============================== SHELL (left sidebar nav) ============================== */
+  .app-shell{ display:flex; min-height:100vh; align-items:stretch; }
+  /* The bare [hidden] UA-stylesheet rule has no special priority and loses to the
+     display:flex rules above at equal specificity in some browsers — without this,
+     toggling .hidden via JS removes the attribute correctly but the element (in
+     particular the fixed, full-viewport login overlay) never actually disappears. */
+  .app-shell[hidden], .login-screen[hidden]{ display:none!important; }
+
+  .sidebar{
+    width:236px; flex:none; background:var(--surface); border-right:1px solid var(--border);
+    display:flex; flex-direction:column; position:sticky; top:0; height:100vh; z-index:30; overflow-y:auto;
+  }
+  .sidebar-brand{ padding:20px 18px 16px; border-bottom:1px solid var(--border); flex:none; }
+  .brand{ display:flex; align-items:baseline; gap:10px; min-width:0; }
+  .brand-mark{ font-family:var(--font-display); font-weight:700; font-size:1.4rem; letter-spacing:-0.01em; white-space:nowrap; }
+  .brand-mark em{ font-style:normal; color:var(--accent); }
+  .brand-tagline{ display:block; font-size:11px; color:var(--ink-muted); letter-spacing:.03em; text-transform:uppercase; margin-top:6px; }
+
+  .side-nav{ flex:1; overflow-y:auto; padding:10px; display:flex; flex-direction:column; gap:2px; }
+  .tab-btn{
+    background:none; border:none; border-radius:var(--radius-sm); border-left:3px solid transparent;
+    padding:10px 11px; font-weight:600; color:var(--ink-muted); text-align:left; width:100%;
+    cursor:pointer; white-space:nowrap; display:flex; align-items:center; gap:10px;
+  }
+  .tab-btn:hover{ color:var(--ink); background:var(--surface-2); }
+  .tab-btn.active{ color:var(--accent-strong); background:var(--accent-soft); border-left-color:var(--accent); }
+  .tab-btn .tab-icon{ width:16px; height:16px; flex:none; }
+
+  .app-main{ flex:1; min-width:0; display:flex; flex-direction:column; }
+
   .topbar{
-    position:sticky; top:0; z-index:30; background:var(--surface);
+    position:sticky; top:0; z-index:20; background:var(--surface);
     border-bottom:1px solid var(--border); padding:14px 20px;
   }
-  .topbar-inner{
-    max-width:1180px; margin:0 auto; display:flex; align-items:center; gap:16px; flex-wrap:wrap;
-  }
-  .brand{ display:flex; align-items:baseline; gap:10px; flex:1 1 260px; min-width:0; }
-  .brand-mark{ font-family:var(--font-display); font-weight:700; font-size:1.5rem; letter-spacing:-0.01em; white-space:nowrap; }
-  .brand-mark em{ font-style:normal; color:var(--accent); }
-  .brand-tagline{ font-size:11.5px; color:var(--ink-muted); letter-spacing:.03em; text-transform:uppercase; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .topbar-inner{ display:flex; align-items:center; justify-content:flex-end; gap:16px; flex-wrap:wrap; }
   .top-controls{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
   .field-inline{ display:flex; align-items:center; gap:6px; font-size:12.5px; color:var(--ink-2); }
   .field-inline label{ white-space:nowrap; }
@@ -163,27 +187,47 @@
   .sync-dot{ width:7px; height:7px; border-radius:50%; background:var(--status-good); flex:none; }
   .sync-dot.local{ background:var(--chart-text-3); }
 
-  .tabbar{
-    position:sticky; top:61px; z-index:20; background:var(--bg);
-    border-bottom:1px solid var(--border); overflow-x:auto; scrollbar-width:none;
+  .theme-toggle{ display:flex; align-items:center; gap:2px; background:var(--surface-2); border:1px solid var(--border); border-radius:999px; padding:3px; }
+  .theme-btn{
+    background:none; border:none; border-radius:999px; padding:5px 10px; font-size:11.5px; font-weight:600;
+    color:var(--ink-muted); cursor:pointer; display:flex; align-items:center; gap:5px; white-space:nowrap;
   }
-  .tabbar::-webkit-scrollbar{ display:none; }
-  .tabbar-inner{ max-width:1180px; margin:0 auto; display:flex; padding:0 20px; }
-  .tab-btn{
-    background:none; border:none; padding:13px 16px; font-weight:600; color:var(--ink-muted);
-    cursor:pointer; white-space:nowrap; border-bottom:3px solid transparent; display:flex; align-items:center; gap:7px;
-  }
-  .tab-btn:hover{ color:var(--ink); }
-  .tab-btn.active{ color:var(--ink); border-bottom-color:var(--accent); }
-  .tab-btn .tab-icon{ width:15px; height:15px; flex:none; }
+  .theme-btn:hover{ color:var(--ink); }
+  .theme-btn.active{ background:var(--surface); color:var(--ink); box-shadow:var(--shadow-1); }
+  .theme-btn svg{ width:13px; height:13px; flex:none; }
 
-  main{ max-width:1180px; margin:0 auto; padding:24px 20px 64px; transition:opacity .25s ease; }
+  main{ max-width:1180px; padding:24px 20px 64px; transition:opacity .25s ease; }
   .view{ display:flex; flex-direction:column; gap:20px; }
   .view[hidden]{ display:none; }
 
   .view-head{ display:flex; justify-content:space-between; align-items:flex-end; gap:16px; flex-wrap:wrap; }
   .view-head h2{ font-size:1.5rem; }
   .view-head p{ margin:4px 0 0; color:var(--ink-2); font-size:13px; max-width:60ch; }
+
+  @media (max-width:860px){
+    .app-shell{ flex-direction:column; }
+    .sidebar{ width:100%; height:auto; position:sticky; top:0; flex-direction:row; align-items:stretch; overflow-y:visible; }
+    .sidebar-brand{ border-bottom:none; border-right:1px solid var(--border); padding:12px 14px; flex:none; display:flex; align-items:center; }
+    .brand-tagline{ display:none; }
+    .side-nav{ flex-direction:row; padding:8px; overflow-x:auto; scrollbar-width:none; }
+    .side-nav::-webkit-scrollbar{ display:none; }
+    .tab-btn{ border-left:none; border-bottom:3px solid transparent; border-radius:0; }
+    .tab-btn.active{ border-left-color:transparent; border-bottom-color:var(--accent); background:none; }
+  }
+
+  /* ============================== LOGIN SCREEN ============================== */
+  .login-screen{
+    position:fixed; inset:0; z-index:100; background:var(--bg);
+    display:flex; align-items:center; justify-content:center; padding:20px;
+  }
+  .login-card{
+    background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg);
+    padding:32px 28px; width:min(380px,100%); box-shadow:var(--shadow-2);
+  }
+  .login-tagline{ text-align:center; color:var(--ink-muted); font-size:13px; margin:8px 0 24px; }
+  .login-footnote{ text-align:center; color:var(--ink-muted); font-size:11.5px; margin:18px 0 0; }
+  .login-card .field label{ font-size:12.5px; }
+  .login-card .field select, .login-card .field input{ width:100%; }
 
   /* ============================== PRIMITIVES ============================== */
   .card{
@@ -275,6 +319,10 @@
 
   .rationale-list{ margin:0; padding-left:18px; display:flex; flex-direction:column; gap:6px; font-size:13px; color:var(--ink-2); }
 
+  .chat-msg{ max-width:78%; padding:9px 13px; border-radius:14px; font-size:13px; line-height:1.5; }
+  .chat-msg.bot{ align-self:flex-start; background:var(--surface-2); color:var(--ink); border-bottom-left-radius:4px; }
+  .chat-msg.user{ align-self:flex-end; background:var(--accent); color:#fff; border-bottom-right-radius:4px; }
+
   .drawer-backdrop{
     position:fixed; inset:0; background:rgba(10,16,14,0.42); z-index:50; display:flex; justify-content:flex-end;
   }
@@ -310,14 +358,57 @@
     .brand-tagline{ display:none; }
     .stat-tile .value{ font-size:1.35rem; }
   }
+
+  @media print{
+    .sidebar, .topbar, form, .no-print{ display:none!important; }
+    .app-main{ display:block; }
+    main{ max-width:none; padding:0; opacity:1!important; }
+    .card{ box-shadow:none; border:1px solid #ccc; }
+  }
 </style>
+
+<div class="login-screen" id="loginScreen" hidden>
+  <div class="login-card">
+    <div class="brand" style="justify-content:center;"><span class="brand-mark">Expense<em>360</em></span></div>
+    <p class="login-tagline" id="loginModeLabel">Sign in to continue</p>
+    <form id="loginForm">
+      <div class="field">
+        <label for="login-name">Your name</label>
+        <input id="login-name" type="text" list="login-name-list" placeholder="e.g. Prabha Iyer" autocomplete="off" required>
+        <datalist id="login-name-list"></datalist>
+      </div>
+      <div class="field" style="margin-top:12px;">
+        <label for="login-role">Signing in as</label>
+        <select id="login-role">
+          <option value="finance">Finance / BU Leader</option>
+          <option value="employee">Employee</option>
+        </select>
+      </div>
+      <div class="field" id="signup-bu-wrap" style="display:none; margin-top:12px;">
+        <label for="signup-bu">Your Business Unit (optional for Finance)</label>
+        <select id="signup-bu"><option value="">No specific Business Unit</option></select>
+      </div>
+      <div id="login-error" class="hint" style="color:var(--status-critical); display:none; margin-top:10px;"></div>
+      <button class="btn btn-primary" type="submit" id="loginSubmitBtn" style="width:100%; justify-content:center; margin-top:16px;">Sign in</button>
+      <button type="button" class="btn btn-ghost btn-sm" id="loginToggleSignup" style="width:100%; justify-content:center; margin-top:8px;">New here? Create an account</button>
+    </form>
+    <p class="login-footnote">Demo sign-in — no password. If your name isn't recognized and "require known user" is on for this workspace, use "Create an account" above.</p>
+    <p class="hint" id="loginDiag" style="text-align:center; margin-top:10px;">Loading…</p>
+  </div>
+</div>
+
+<div class="app-shell" id="appShell" hidden>
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand"><span class="brand-mark">Expense<em>360</em></span></div>
+    <span class="brand-tagline">Intelligence &amp; decision-support layer</span>
+  </div>
+  <nav class="side-nav" id="tabbarInner"></nav>
+</aside>
+<div class="app-main">
 
 <div class="topbar">
   <div class="topbar-inner">
-    <div class="brand">
-      <span class="brand-mark">Expense<em>360</em></span>
-      <span class="brand-tagline">Intelligence &amp; decision-support layer</span>
-    </div>
     <div class="top-controls">
       <span class="sync-pill" id="syncPill"><span class="sync-dot" id="syncDot"></span><span id="syncLabel">Connecting…</span></span>
       <div class="field-inline">
@@ -332,12 +423,14 @@
         <input class="chip" id="actorInput" type="text" value="Finance Team">
         <span id="actorWarn" class="hint" style="color:var(--status-critical); display:none; white-space:nowrap;">Not in login directory</span>
       </div>
+      <div class="theme-toggle" id="themeToggle">
+        <button type="button" class="theme-btn" data-theme-choice="light"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="3"/><path d="M8 1.5v2M8 12.5v2M1.5 8h2M12.5 8h2M3.5 3.5l1.4 1.4M11.1 11.1l1.4 1.4M3.5 12.5l1.4-1.4M11.1 4.9l1.4-1.4"/></svg>Light</button>
+        <button type="button" class="theme-btn" data-theme-choice="dark"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13.5 9.5A6 6 0 1 1 6.5 2.5a5 5 0 0 0 7 7Z"/></svg>Dark</button>
+        <button type="button" class="theme-btn" data-theme-choice="system">Auto</button>
+      </div>
+      <button type="button" class="btn btn-sm btn-ghost" id="signOutBtn">Sign out</button>
     </div>
   </div>
-</div>
-
-<div class="tabbar">
-  <div class="tabbar-inner" id="tabbarInner"></div>
 </div>
 
 <main id="main">
@@ -381,6 +474,49 @@
         </div>
         <div id="ov-pending"></div>
       </div>
+    </div>
+  </section>
+
+  <!-- ACTION DIGEST -->
+  <section class="view" id="view-digest" data-role="finance">
+    <div class="view-head">
+      <div>
+        <h2>Action Digest</h2>
+        <p>Everything currently awaiting your action, in one place — scoped to your Business Unit where approval delegation applies.</p>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><h3>Per-diem recommendations pending a decision</h3><span class="hint" id="dg-perdiem-count"></span></div>
+      <div id="dg-perdiem"></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><h3>Alerts you can acknowledge</h3><span class="hint" id="dg-alerts-count"></span></div>
+      <div id="dg-alerts"></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><h3>Expenses needing second approval</h3><span class="hint" id="dg-second-count"></span></div>
+      <div id="dg-second"></div>
+    </div>
+  </section>
+
+  <!-- POLICY ASSISTANT -->
+  <section class="view" id="view-policy" data-role="all">
+    <div class="view-head">
+      <div>
+        <h2>Policy Assistant</h2>
+        <p>Ask about per-diem limits, Business Unit budgets, expense categories or how approvals work. Keyword-matched against the T&amp;E policy and live app data — not a general AI chat.</p>
+      </div>
+    </div>
+    <div class="card" style="padding:16px; display:flex; flex-direction:column; height:460px;">
+      <div id="policy-chat" style="flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:10px; padding:4px 4px 8px;"></div>
+      <form id="policyForm" style="display:flex; gap:8px; margin-top:8px; flex:none;">
+        <input id="policy-input" type="text" class="chip" style="flex:1; width:auto;" placeholder="e.g. What's the per-diem for Tokyo?" autocomplete="off">
+        <button class="btn btn-primary" type="submit">Ask</button>
+      </form>
+    </div>
+    <div class="card">
+      <div class="card-head"><h3>Try asking</h3></div>
+      <div id="policy-samples" style="display:flex; gap:8px; flex-wrap:wrap;"></div>
     </div>
   </section>
 
@@ -497,19 +633,48 @@
       <form id="expenseForm" class="form-grid">
         <div class="field" style="grid-column:1/-1;">
           <label for="exp-receipt">Scan a receipt (optional) — auto-fills amount, date, category, bill no. &amp; location below</label>
-          <input id="exp-receipt" type="file" accept="image/*">
+          <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+            <input id="exp-receipt" type="file" accept="image/*" style="flex:1; min-width:180px;">
+            <span class="hint">Bill language:</span>
+            <select id="exp-receipt-lang" class="chip" style="width:auto;">
+              <option value="eng|en">English</option>
+              <option value="hin|hi">Hindi</option>
+              <option value="spa|es">Spanish</option>
+              <option value="fra|fr">French</option>
+              <option value="deu|de">German</option>
+              <option value="por|pt">Portuguese</option>
+              <option value="ita|it">Italian</option>
+              <option value="jpn|ja">Japanese</option>
+              <option value="chi_sim|zh-CN">Chinese (Simplified)</option>
+              <option value="ara|ar">Arabic</option>
+            </select>
+          </div>
           <div id="exp-receipt-status" class="hint" style="margin-top:6px;"></div>
           <img id="exp-receipt-preview" alt="" style="display:none; max-width:160px; max-height:120px; border-radius:8px; margin-top:8px; border:1px solid var(--border);">
+          <div id="exp-items-wrap" style="display:none; margin-top:10px; background:var(--surface-2); border-radius:var(--radius-md); padding:12px;">
+            <div class="hint" style="margin-bottom:8px;">Itemized lines found — add checked items as separate expenses (shares this bill's Business Unit / Project / Destination / Date / Bill No. / Location below), or ignore and submit the single total above instead.</div>
+            <div id="exp-items-list"></div>
+            <button type="button" class="btn btn-sm btn-primary" id="exp-items-add" style="margin-top:8px;">Add checked items as separate expenses</button>
+          </div>
         </div>
         <div class="field"><label for="exp-bu">Business Unit</label><select id="exp-bu"></select></div>
-        <div class="field"><label for="exp-dest">Destination</label><select id="exp-dest"></select></div>
+        <div class="field"><label for="exp-dest">Destination</label><select id="exp-dest"></select><span class="hint" id="exp-dest-policy" style="display:block; margin-top:4px;"></span></div>
         <div class="field"><label for="exp-project">Project</label><select id="exp-project"><option value="">No project / general</option></select></div>
         <div class="field"><label for="exp-cat">Category</label>
           <select id="exp-cat">
-            <option>Lodging</option><option>Meals</option><option>Transport</option><option>Airfare</option><option>Other</option>
+            <option>Lodging</option><option>Meals</option><option>Transport</option><option>Mileage</option><option>Airfare</option><option>Other</option>
           </select>
         </div>
-        <div class="field"><label for="exp-amount">Amount (USD)</label><input id="exp-amount" type="number" min="1" step="1" required></div>
+        <div class="field" id="exp-mileage-wrap" style="display:none;"><label for="exp-distance">Distance (miles)</label><input id="exp-distance" type="number" min="0" step="0.1"></div>
+        <div class="field"><label for="exp-amount">Amount</label>
+          <div style="display:flex; gap:6px;">
+            <input id="exp-amount" type="number" min="0" step="0.01" required style="flex:1;">
+            <select id="exp-currency" class="chip" style="width:auto;">
+              <option value="USD">USD $</option><option value="EUR">EUR €</option><option value="GBP">GBP £</option>
+              <option value="INR">INR ₹</option><option value="JPY">JPY ¥</option><option value="SGD">SGD S$</option><option value="AED">AED</option>
+            </select>
+          </div>
+        </div>
         <div class="field"><label for="exp-date">Date</label><input id="exp-date" type="date" required></div>
         <div class="field"><label for="exp-employee">Employee</label><input id="exp-employee" type="text" placeholder="e.g. A. Bansal" required></div>
         <div class="field"><label for="exp-billno">Bill / Invoice No. (optional)</label><input id="exp-billno" type="text" placeholder="e.g. INV-10432"></div>
@@ -524,6 +689,8 @@
         <div class="field-inline">
           <label for="exp-filter-bu">Business Unit</label>
           <select class="chip" id="exp-filter-bu"><option value="">All</option></select>
+          <button type="button" class="btn btn-sm btn-ghost no-print" id="exp-export-csv">Export CSV</button>
+          <button type="button" class="btn btn-sm btn-ghost no-print" id="exp-export-print">Print / PDF</button>
         </div>
       </div>
       <div class="table-scroll">
@@ -563,6 +730,7 @@
         <h2>Audit log</h2>
         <p>Every decision, override and alert acknowledgement is recorded here for governance and transparency.</p>
       </div>
+      <button type="button" class="btn btn-sm btn-ghost no-print" id="audit-export-csv">Export CSV</button>
     </div>
     <div class="card" style="padding:0;">
       <div class="table-scroll">
@@ -591,6 +759,14 @@
         <div class="field" style="justify-content:flex-end;">
           <label style="display:flex; align-items:center; gap:8px; font-weight:600;"><input type="checkbox" id="set-require-user" style="width:auto;"> Require name to match an active directory user below</label>
         </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><h3>Approval delegation</h3></div>
+      <p class="hint" style="margin:0 0 12px;">A Finance user assigned to a Business Unit in the directory below can only acknowledge that BU's alerts; a directory entry with no Business Unit (or an unrecognized name) is treated as senior/global Finance and can act on anything. Expenses at or above the threshold need a senior Finance "Confirm" in Transactions before they're considered fully approved.</p>
+      <div class="field" style="max-width:260px;">
+        <label for="set-second-approval">Second-approval threshold (USD)</label>
+        <input id="set-second-approval" type="number" min="0" step="50">
       </div>
     </div>
     <div class="card">
@@ -631,17 +807,46 @@
       <form id="expenseFormEmp" class="form-grid">
         <div class="field" style="grid-column:1/-1;">
           <label for="empexp-receipt">Scan a receipt (optional) — auto-fills amount, date, category, bill no. &amp; location below</label>
-          <input id="empexp-receipt" type="file" accept="image/*">
+          <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+            <input id="empexp-receipt" type="file" accept="image/*" style="flex:1; min-width:180px;">
+            <span class="hint">Bill language:</span>
+            <select id="empexp-receipt-lang" class="chip" style="width:auto;">
+              <option value="eng|en">English</option>
+              <option value="hin|hi">Hindi</option>
+              <option value="spa|es">Spanish</option>
+              <option value="fra|fr">French</option>
+              <option value="deu|de">German</option>
+              <option value="por|pt">Portuguese</option>
+              <option value="ita|it">Italian</option>
+              <option value="jpn|ja">Japanese</option>
+              <option value="chi_sim|zh-CN">Chinese (Simplified)</option>
+              <option value="ara|ar">Arabic</option>
+            </select>
+          </div>
           <div id="empexp-receipt-status" class="hint" style="margin-top:6px;"></div>
           <img id="empexp-receipt-preview" alt="" style="display:none; max-width:160px; max-height:120px; border-radius:8px; margin-top:8px; border:1px solid var(--border);">
+          <div id="empexp-items-wrap" style="display:none; margin-top:10px; background:var(--surface-2); border-radius:var(--radius-md); padding:12px;">
+            <div class="hint" style="margin-bottom:8px;">Itemized lines found — add checked items as separate expenses (shares this bill's Business Unit / Project / Destination / Date / Bill No. / Location below), or ignore and submit the single total above instead.</div>
+            <div id="empexp-items-list"></div>
+            <button type="button" class="btn btn-sm btn-primary" id="empexp-items-add" style="margin-top:8px;">Add checked items as separate expenses</button>
+          </div>
         </div>
         <div class="field"><label for="empexp-bu">Business Unit</label><select id="empexp-bu"></select></div>
-        <div class="field"><label for="empexp-dest">Destination</label><select id="empexp-dest"></select></div>
+        <div class="field"><label for="empexp-dest">Destination</label><select id="empexp-dest"></select><span class="hint" id="empexp-dest-policy" style="display:block; margin-top:4px;"></span></div>
         <div class="field"><label for="empexp-project">Project</label><select id="empexp-project"><option value="">No project / general</option></select></div>
         <div class="field"><label for="empexp-cat">Category</label>
-          <select id="empexp-cat"><option>Lodging</option><option>Meals</option><option>Transport</option><option>Airfare</option><option>Other</option></select>
+          <select id="empexp-cat"><option>Lodging</option><option>Meals</option><option>Transport</option><option>Mileage</option><option>Airfare</option><option>Other</option></select>
         </div>
-        <div class="field"><label for="empexp-amount">Amount (USD)</label><input id="empexp-amount" type="number" min="1" step="1" required></div>
+        <div class="field" id="empexp-mileage-wrap" style="display:none;"><label for="empexp-distance">Distance (miles)</label><input id="empexp-distance" type="number" min="0" step="0.1"></div>
+        <div class="field"><label for="empexp-amount">Amount</label>
+          <div style="display:flex; gap:6px;">
+            <input id="empexp-amount" type="number" min="0" step="0.01" required style="flex:1;">
+            <select id="empexp-currency" class="chip" style="width:auto;">
+              <option value="USD">USD $</option><option value="EUR">EUR €</option><option value="GBP">GBP £</option>
+              <option value="INR">INR ₹</option><option value="JPY">JPY ¥</option><option value="SGD">SGD S$</option><option value="AED">AED</option>
+            </select>
+          </div>
+        </div>
         <div class="field"><label for="empexp-date">Date</label><input id="empexp-date" type="date" required></div>
         <div class="field"><label for="empexp-billno">Bill / Invoice No. (optional)</label><input id="empexp-billno" type="text" placeholder="e.g. INV-10432"></div>
         <div class="field"><label for="empexp-location">Location (optional)</label><input id="empexp-location" type="text" placeholder="Venue / city on the bill"></div>
@@ -663,12 +868,28 @@
 
 <footer class="app-foot">Expense360 Console — a working demo of the MVP1/MVP2 proposal. Recommendations are illustrative, rule-based heuristics for this demo, not a production ML model.</footer>
 
+</div>
+</div>
+
 <script>
 (function(){
   "use strict";
 
   /* ============================== CONSTANTS ============================== */
-  var CATEGORIES = ["Lodging","Meals","Transport","Airfare","Other"];
+  var CATEGORIES = ["Lodging","Meals","Transport","Mileage","Airfare","Other"];
+  var CURRENCIES = [
+    { code:"USD", symbol:"$", name:"US Dollar" },
+    { code:"EUR", symbol:"€", name:"Euro" },
+    { code:"GBP", symbol:"£", name:"British Pound" },
+    { code:"INR", symbol:"₹", name:"Indian Rupee" },
+    { code:"JPY", symbol:"¥", name:"Japanese Yen" },
+    { code:"SGD", symbol:"S$", name:"Singapore Dollar" },
+    { code:"AED", symbol:"AED", name:"UAE Dirham" }
+  ];
+  // Units of currency per 1 USD. Used as a fallback and until/unless a live rate loads.
+  var FALLBACK_FX_RATES = { USD:1, EUR:0.92, GBP:0.78, INR:83.3, JPY:149, SGD:1.34, AED:3.67 };
+  var fxRates = Object.assign({}, FALLBACK_FX_RATES);
+  var MILEAGE_RATE_USD = 0.67; // USD per mile
   var SERIES = ["var(--series-1)","var(--series-2)","var(--series-3)","var(--series-4)","var(--series-5)"];
   var STATUS_ICONS = {
     good: '<svg width="12" height="12" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M5 8.2l2 2 4-4.4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
@@ -680,8 +901,67 @@
   var fmtUSD2 = new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0});
   function money(n){ return fmtUSD0.format(Math.round(n)); }
   function pct(n){ return Math.round(n) + "%"; }
+  function currencySymbol(code){ var c = CURRENCIES.find(function(x){ return x.code===code; }); return c ? c.symbol : "$"; }
+  function moneyIn(amount, code){
+    if (!code || code === "USD") return money(amount);
+    return currencySymbol(code) + Math.round(amount).toLocaleString('en-US');
+  }
+  function expenseUSD(e){ return e.amountUSD != null ? e.amountUSD : e.amount; }
+  function toUSD(amount, code){
+    if (!code || code === "USD") return amount;
+    var rate = fxRates[code] || FALLBACK_FX_RATES[code] || 1;
+    return amount / rate;
+  }
+  function fromUSD(amountUSD, code){
+    if (!code || code === "USD") return amountUSD;
+    var rate = fxRates[code] || FALLBACK_FX_RATES[code] || 1;
+    return amountUSD * rate;
+  }
+  async function loadLiveFxRates(){
+    try {
+      var res = await fetch("https://open.er-api.com/v6/latest/USD");
+      var data = await res.json();
+      if (data && data.result === "success" && data.rates){
+        CURRENCIES.forEach(function(c){ if (data.rates[c.code]) fxRates[c.code] = data.rates[c.code]; });
+      }
+    } catch(e){ console.warn("live FX rates unavailable, using fallback rates", e); }
+  }
   function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]; }); }
   function statusChip(sev, label){ return '<span class="status-chip"><span class="status-icon status-'+sev+'">'+STATUS_ICONS[sev]+'</span><span>'+esc(label)+'</span></span>'; }
+
+  function downloadCSV(filename, headers, rows){
+    var esc = function(v){
+      v = v==null ? "" : String(v);
+      return /[",\n]/.test(v) ? '"'+v.replace(/"/g,'""')+'"' : v;
+    };
+    var lines = [headers.map(esc).join(",")].concat(rows.map(function(r){ return r.map(esc).join(","); }));
+    var blob = new Blob([lines.join("\n")], { type:"text/csv;charset=utf-8;" });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+  }
+
+  /* ============================== THEME ============================== */
+  var THEME_KEY = "expense360-theme";
+  function applyTheme(choice){
+    if (choice === "light") document.documentElement.setAttribute("data-theme","light");
+    else if (choice === "dark") document.documentElement.setAttribute("data-theme","dark");
+    else document.documentElement.removeAttribute("data-theme");
+    document.querySelectorAll(".theme-btn").forEach(function(b){
+      b.classList.toggle("active", b.getAttribute("data-theme-choice") === choice);
+    });
+    try { localStorage.setItem(THEME_KEY, choice); } catch(e){}
+  }
+  document.querySelectorAll(".theme-btn").forEach(function(b){
+    b.addEventListener("click", function(){ applyTheme(b.getAttribute("data-theme-choice")); });
+  });
+  (function initTheme(){
+    var saved = "system";
+    try { saved = localStorage.getItem(THEME_KEY) || "system"; } catch(e){}
+    applyTheme(saved);
+  })();
 
   /* ============================== SEEDED RNG ============================== */
   function mulberry32(seed){
@@ -773,7 +1053,7 @@
     { id:"user-menon", name:"K. Menon", role:"employee", buId:"success", active:true }
   ];
 
-  var DEFAULT_SETTINGS = { defaultRole:"finance", requireKnownUser:false };
+  var DEFAULT_SETTINGS = { defaultRole:"finance", requireKnownUser:false, secondApprovalThreshold:1000 };
 
   function daysAgo(n){ var d = new Date(); d.setDate(d.getDate()-n); return d.toISOString(); }
   function lastNMonths(n){
@@ -821,6 +1101,7 @@
       var r = anomalyPicks[Math.floor(rand()*anomalyPicks.length)];
       if (r) r.amount = Math.round(r.amount * randRange(2.2,2.8));
     }
+    rows.forEach(function(row){ row.currency = "USD"; row.amountUSD = row.amount; });
     return rows;
   }
 
@@ -865,6 +1146,8 @@
 
   var TABS = [
     { id:"overview", label:"Overview", role:"finance", icon:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1.5" y="8.5" width="3" height="6"/><rect x="6.5" y="4.5" width="3" height="10"/><rect x="11.5" y="1.5" width="3" height="13"/></svg>' },
+    { id:"digest", label:"Action Digest", role:"finance", icon:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 1.6a4.4 4.4 0 0 0-4.4 4.4v2.4L2.2 11h11.6l-1.4-2.6V6a4.4 4.4 0 0 0-4.4-4.4Z"/><path d="M6.2 12.8a1.8 1.8 0 0 0 3.6 0"/></svg>' },
+    { id:"policy", label:"Policy Assistant", role:"all", icon:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 3.2h12v7.6H6.8L3.2 13.6V10.8H2Z"/><path d="M5 6.2h6M5 8.4h4"/></svg>' },
     { id:"perdiem", label:"Per-Diem", role:"finance", icon:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6.3"/><path d="M8 4.6v3.6l2.4 1.4"/></svg>' },
     { id:"myperdiem", label:"My Per Diem", role:"employee", icon:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6.3"/><path d="M8 4.6v3.6l2.4 1.4"/></svg>' },
     { id:"budgets", label:"Budgets & Alerts", role:"finance", icon:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 1.6 14.4 5v6L8 14.4 1.6 11V5Z"/><path d="M8 6v2.6l1.8 1"/></svg>' },
@@ -1066,6 +1349,22 @@
     return state.users.some(function(u){ return u.active && u.role === role && u.name.trim().toLowerCase() === n; });
   }
 
+  /* Approval delegation: a Finance user scoped to a Business Unit in the Login
+     Directory can only act on that BU's items; a directory entry with no BU
+     (or a name that isn't in the directory at all) is treated as senior/global
+     Finance and can act on anything — matches how the seeded "Finance Team" /
+     Prabha Iyer / Rajesh Simhadri entries are set up. */
+  function currentUserBuId(){
+    var n = state.actor.trim().toLowerCase();
+    var u = state.users.find(function(x){ return x.active && x.role === "finance" && x.name.trim().toLowerCase() === n; });
+    return u ? u.buId : "";
+  }
+  function canActOnBU(buId){
+    if (state.role !== "finance") return false;
+    var myBu = currentUserBuId();
+    return !myBu || !buId || buId === myBu;
+  }
+
   /* ============================== MUTATIONS ============================== */
   function pushAudit(action, target, detail){
     var entry = { id: idFrom("audit"), actor: state.actor, role: state.role, action:action, target:target, detail:detail, timestamp:new Date().toISOString() };
@@ -1098,6 +1397,7 @@
 
   function acknowledgeAlert(alertId){
     var a = state.alerts.find(function(x){ return x.id === alertId; }); if (!a) return;
+    if (!canActOnBU(a.buId)) return;
     var patch = { acknowledged:true, acknowledgedBy: state.actor, acknowledgedAt:new Date().toISOString() };
     Object.assign(a, patch);
     persist("alerts", "update", alertId, patch);
@@ -1106,7 +1406,21 @@
     renderAll();
   }
 
+  function confirmSecondApproval(expenseId){
+    if (currentUserBuId()) return; // only senior/global Finance can confirm
+    var exp = state.expenses.find(function(x){ return x.id === expenseId; }); if (!exp || !exp.needsSecondApproval) return;
+    var patch = { secondApprovalConfirmed:true, secondApprovalBy: state.actor, secondApprovalAt:new Date().toISOString() };
+    Object.assign(exp, patch);
+    persist("expenses", "update", expenseId, patch);
+    pushAudit("Confirmed second-approval expense", buName(exp.buId), moneyIn(exp.amount, exp.currency)+" "+exp.category+" for "+exp.employee+".");
+    saveLocal();
+    renderAll();
+  }
+
   async function addExpense(data){
+    data.currency = data.currency || "USD";
+    data.amountUSD = toUSD(data.amount, data.currency);
+    data.needsSecondApproval = data.amountUSD >= (state.settings.secondApprovalThreshold || Infinity);
     var id = await createRemote("expenses", data);
     data.id = id;
     state.expenses.unshift(data);
@@ -1114,6 +1428,18 @@
     refreshAutomatedAlerts();
     saveLocal();
     renderAll();
+  }
+
+  function findPossibleDuplicate(data){
+    var amt = toUSD(data.amount, data.currency || "USD");
+    var day = new Date(data.date+"T00:00:00").getTime();
+    return state.expenses.find(function(e){
+      if (e.buId !== data.buId || e.destinationId !== data.destinationId || e.category !== data.category) return false;
+      var eAmt = expenseUSD(e);
+      if (Math.abs(eAmt - amt) / Math.max(eAmt, amt, 1) > 0.02) return false;
+      var eDay = new Date(e.date+"T00:00:00").getTime();
+      return Math.abs(eDay - day) <= 2*86400000;
+    });
   }
 
   /* ============================== AI PIPELINE (per-diem optimization + alerts) ==============================
@@ -1124,8 +1450,8 @@
   function computeRecommendation(dest){
     var rows = state.expenses.filter(function(e){ return e.destinationId === dest.id && e.category === "Lodging"; });
     var tripCount = rows.length;
-    var mean = tripCount ? rows.reduce(function(s,r){ return s+r.amount; },0) / tripCount : 0;
-    var variance = tripCount ? rows.reduce(function(s,r){ return s+Math.pow(r.amount-mean,2); },0) / tripCount : 0;
+    var mean = tripCount ? rows.reduce(function(s,r){ return s+expenseUSD(r); },0) / tripCount : 0;
+    var variance = tripCount ? rows.reduce(function(s,r){ return s+Math.pow(expenseUSD(r)-mean,2); },0) / tripCount : 0;
     var cv = mean ? Math.sqrt(variance) / mean : 0; // coefficient of variation: lower = more consistent spend
 
     var trend = dest.hotelTrend || [];
@@ -1139,7 +1465,7 @@
     var confidence = Math.round(50 + Math.min(30, tripCount*3) - Math.min(30, cv*60));
     confidence = Math.max(35, Math.min(95, confidence));
 
-    var overCount = rows.filter(function(r){ return r.amount > dest.currentPerDiem; }).length;
+    var overCount = rows.filter(function(r){ return expenseUSD(r) > dest.currentPerDiem; }).length;
     var overShare = tripCount ? Math.round((overCount/tripCount)*100) : 0;
 
     var rationale = [];
@@ -1195,7 +1521,7 @@
     state.destinations.filter(function(d){ return d.status === "pending"; }).forEach(function(dest){
       var rows = state.expenses.filter(function(e){ return e.destinationId === dest.id && e.category === "Lodging"; });
       if (rows.length < 4) return;
-      var overCount = rows.filter(function(r){ return r.amount > dest.currentPerDiem; }).length;
+      var overCount = rows.filter(function(r){ return expenseUSD(r) > dest.currentPerDiem; }).length;
       if (overCount / rows.length >= 0.6){
         upsertAlert("auto-perdiem-"+dest.id, {
           type:"perdiem_deviation", severity:"warning", buId:null,
@@ -1210,7 +1536,7 @@
       var exp = state.expenses.find(function(e){ return e.id === expId; }); if (!exp) return;
       upsertAlert("auto-anomaly-"+expId, {
         type:"unusual_spend_increase", severity:"serious", buId: exp.buId,
-        message: buName(exp.buId)+"'s "+exp.category.toLowerCase()+" spend in "+destName(exp.destinationId)+" ("+money(exp.amount)+") is a statistical outlier for that destination/category."
+        message: buName(exp.buId)+"'s "+exp.category.toLowerCase()+" spend in "+destName(exp.destinationId)+" ("+money(expenseUSD(exp))+") is a statistical outlier for that destination/category."
       });
     });
   }
@@ -1226,12 +1552,12 @@
     Object.keys(groups).forEach(function(key){
       var rows = groups[key];
       if (rows.length < 4) return;
-      var mean = rows.reduce(function(s,r){ return s+r.amount; },0) / rows.length;
-      var variance = rows.reduce(function(s,r){ return s + Math.pow(r.amount-mean,2); },0) / rows.length;
+      var mean = rows.reduce(function(s,r){ return s+expenseUSD(r); },0) / rows.length;
+      var variance = rows.reduce(function(s,r){ return s + Math.pow(expenseUSD(r)-mean,2); },0) / rows.length;
       var sd = Math.sqrt(variance);
       if (sd === 0) return;
       rows.forEach(function(r){
-        if ((r.amount - mean) / sd > 2.2) flagged[r.id] = { mean:mean, sd:sd };
+        if ((expenseUSD(r) - mean) / sd > 2.2) flagged[r.id] = { mean:mean, sd:sd };
       });
     });
     return flagged;
@@ -1275,6 +1601,16 @@
       return Math.max.apply(null, nums);
     }
     return null;
+  }
+
+  function guessCurrency(text){
+    if (/₹/.test(text) || /\bINR\b/i.test(text) || /\bRs\.?\s?\d/.test(text)) return "INR";
+    if (/€/.test(text) || /\bEUR\b/i.test(text)) return "EUR";
+    if (/£/.test(text) || /\bGBP\b/i.test(text)) return "GBP";
+    if (/¥/.test(text) || /\bJPY\b/i.test(text)) return "JPY";
+    if (/\bAED\b/i.test(text)) return "AED";
+    if (/\bSGD\b|S\$/.test(text)) return "SGD";
+    return "USD";
   }
 
   function guessDate(text){
@@ -1332,32 +1668,113 @@
     return "";
   }
 
+  var SUMMARY_LINE_WORDS = ["total","subtotal","sub-total","tax","vat","gst","tip","gratuity","change","cash","card","visa","mastercard","amex","balance","due","discount","service charge"];
+  function extractLineItems(text){
+    var lines = text.split(/\n/).map(function(l){ return l.trim(); }).filter(Boolean);
+    var items = [];
+    lines.forEach(function(line){
+      var lower = line.toLowerCase();
+      if (SUMMARY_LINE_WORDS.some(function(w){ return lower.indexOf(w) !== -1; })) return;
+      var m = line.match(/^(.{2,40}?)[\s.]{2,}[$₹€£]?\s?(\d{1,4}(?:\.\d{2}))$/);
+      if (!m) m = line.match(/^(.{2,40}?)\s+[$₹€£]\s?(\d{1,4}(?:\.\d{2}))$/);
+      if (m){
+        var desc = m[1].replace(/[.\s]+$/,"").trim();
+        var amt = parseFloat(m[2]);
+        if (desc.length >= 2 && amt > 0 && amt < 5000) items.push({ description:desc, amount:amt, category:guessCategory(desc) });
+      }
+    });
+    return items;
+  }
+
+  function chunkText(text, maxLen){
+    var lines = text.split(/\n/);
+    var chunks = [], cur = "";
+    lines.forEach(function(l){
+      if ((cur+"\n"+l).length > maxLen){ if (cur) chunks.push(cur); cur = l; }
+      else cur = cur ? cur+"\n"+l : l;
+    });
+    if (cur) chunks.push(cur);
+    return chunks;
+  }
+  async function translateToEnglish(text, langCode){
+    if (!langCode || langCode === "en" || !text.trim()) return text;
+    try {
+      var chunks = chunkText(text, 450);
+      var out = [];
+      for (var i=0;i<chunks.length;i++){
+        var url = "https://api.mymemory.translated.net/get?q="+encodeURIComponent(chunks[i])+"&langpair="+encodeURIComponent(langCode)+"|en";
+        var res = await fetch(url);
+        var data = await res.json();
+        out.push((data && data.responseData && data.responseData.translatedText) ? data.responseData.translatedText : chunks[i]);
+      }
+      return out.join("\n");
+    } catch(e){
+      console.warn("translation failed, using original OCR text", e);
+      return text;
+    }
+  }
+
+  function renderItemsPanel(ids, items){
+    if (!ids.itemsWrap || !ids.itemsList) return;
+    var wrap = document.getElementById(ids.itemsWrap);
+    var list = document.getElementById(ids.itemsList);
+    if (!items.length){ wrap.style.display = "none"; list.innerHTML = ""; return; }
+    list.innerHTML = items.map(function(it){
+      return '<div class="alert-row" data-item-row data-item-currency="'+esc(it.currency||"USD")+'">'+
+        '<input type="checkbox" checked data-item-check style="margin-top:6px;">'+
+        '<div class="alert-body" style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">'+
+          '<input type="text" class="chip" style="width:180px;" value="'+esc(it.description)+'" data-item-desc>'+
+          '<span class="hint">'+esc(currencySymbol(it.currency||"USD"))+'</span>'+
+          '<input type="number" class="chip" style="width:90px;" step="0.01" value="'+it.amount+'" data-item-amount>'+
+          '<select class="chip" data-item-cat>'+CATEGORIES.map(function(c){ return '<option'+(c===it.category?' selected':'')+'>'+c+'</option>'; }).join("")+'</select>'+
+        '</div>'+
+      '</div>';
+    }).join("");
+    wrap.style.display = "block";
+  }
+
   async function handleReceiptUpload(evt, ids){
     var file = evt.target.files[0]; if (!file) return;
     var statusEl = document.getElementById(ids.status);
     var previewEl = ids.preview ? document.getElementById(ids.preview) : null;
     if (previewEl){ previewEl.src = URL.createObjectURL(file); previewEl.style.display = "block"; }
+    var langSel = ids.lang ? document.getElementById(ids.lang) : null;
+    var langParts = (langSel ? langSel.value : "eng|en").split("|");
+    var tessLang = langParts[0] || "eng", translateLang = langParts[1] || "en";
+
     statusEl.style.color = "";
     statusEl.textContent = "Loading OCR engine…";
     try {
       await loadTesseract();
       statusEl.textContent = "Reading receipt…";
-      var result = await window.Tesseract.recognize(file, "eng", {
+      var result = await window.Tesseract.recognize(file, tessLang, {
         logger: function(m){
           if (m.status === "recognizing text" && typeof m.progress === "number"){
             statusEl.textContent = "Reading receipt… " + Math.round(m.progress*100) + "%";
           }
         }
       });
-      var text = (result && result.data && result.data.text) || "";
+      var rawText = (result && result.data && result.data.text) || "";
+      var text = rawText, translated = false;
+      if (translateLang !== "en" && rawText.trim()){
+        statusEl.textContent = "Translating to English…";
+        text = await translateToEnglish(rawText, translateLang);
+        translated = text !== rawText;
+      }
+
       var amount = guessAmount(text);
+      var currency = guessCurrency(rawText);
       var date = guessDate(text);
       var cat = guessCategory(text);
       var destId = guessDestination(text);
       var billNo = guessBillNo(text);
       var location = guessLocation(text);
+      var items = extractLineItems(text);
+      items.forEach(function(it){ if (it.category === "Other") it.category = cat; it.currency = currency; });
+
       var found = [];
-      if (amount){ document.getElementById(ids.amount).value = amount; found.push("amount "+money(amount)); }
+      if (ids.currency){ document.getElementById(ids.currency).value = currency; if (currency !== "USD") found.push("currency "+currency); }
+      if (amount){ document.getElementById(ids.amount).value = amount; found.push("amount "+moneyIn(amount, currency)); }
       if (date){ document.getElementById(ids.date).value = date; found.push("date "+date); }
       document.getElementById(ids.cat).value = cat; found.push("category "+cat);
       if (destId && ids.dest){ document.getElementById(ids.dest).value = destId; found.push("destination "+destName(destId)); }
@@ -1368,15 +1785,55 @@
         var notesEl = document.getElementById(ids.notes);
         if (firstLine && !notesEl.value) notesEl.value = firstLine.slice(0,80);
       }
+      renderItemsPanel(ids, items);
+      if (items.length) found.push(items.length+" line item(s) detected below");
+
       statusEl.style.color = "var(--status-good)";
+      var prefix = translated ? "Translated to English and extracted " : "Extracted ";
       statusEl.textContent = found.length
-        ? ("Extracted "+found.join(", ")+" — please review before submitting.")
+        ? (prefix+found.join(", ")+" — please review before submitting.")
         : "Couldn't confidently read this receipt — please fill in the details manually.";
     } catch(err){
       console.warn("receipt OCR failed", err);
       statusEl.style.color = "var(--status-critical)";
       statusEl.textContent = "Couldn't read this receipt automatically — please enter the details manually.";
     }
+  }
+
+  async function addItemsFromPanel(prefix){
+    var listEl = document.getElementById(prefix+"-items-list");
+    var rows = Array.prototype.slice.call(listEl.querySelectorAll("[data-item-row]"));
+    var statusEl = document.getElementById(prefix+"-receipt-status");
+    if (prefix === "empexp" && state.settings.requireKnownUser && !isKnownActiveUser(state.actor, "employee")){
+      statusEl.style.color = "var(--status-critical)";
+      statusEl.textContent = '"'+state.actor+'" is not an active Employee in the login directory. Ask Finance to add you under Login Settings.';
+      return;
+    }
+    var shared = {
+      buId: document.getElementById(prefix+"-bu").value,
+      destinationId: document.getElementById(prefix+"-dest").value,
+      projectId: document.getElementById(prefix+"-project").value,
+      date: document.getElementById(prefix+"-date").value || new Date().toISOString().slice(0,10),
+      billNo: document.getElementById(prefix+"-billno").value,
+      location: document.getElementById(prefix+"-location").value
+    };
+    var employee = prefix === "exp" ? document.getElementById("exp-employee").value : state.actor;
+    var added = 0;
+    for (var i=0;i<rows.length;i++){
+      var row = rows[i];
+      if (!row.querySelector("[data-item-check]").checked) continue;
+      var desc = row.querySelector("[data-item-desc]").value.trim();
+      var amt = +row.querySelector("[data-item-amount]").value;
+      var cat = row.querySelector("[data-item-cat]").value;
+      var curr = row.getAttribute("data-item-currency") || "USD";
+      if (!amt || amt <= 0) continue;
+      await addExpense(Object.assign({}, shared, { category:cat, amount:amt, currency:curr, employee:employee, notes:desc, submittedBy:employee }));
+      added++;
+    }
+    document.getElementById(prefix+"-items-wrap").style.display = "none";
+    listEl.innerHTML = "";
+    statusEl.style.color = added ? "var(--status-good)" : "var(--status-critical)";
+    statusEl.textContent = added ? ("Added "+added+" itemized expense(s) from this bill.") : "No items were checked — nothing added.";
   }
 
   /* ============================== CHART HELPERS ============================== */
@@ -1536,13 +1993,13 @@
 
   /* ============================== DERIVED DATA ============================== */
   function spendForBU(buId){
-    return state.expenses.filter(function(e){ return e.buId === buId; }).reduce(function(s,e){ return s+e.amount; },0);
+    return state.expenses.filter(function(e){ return e.buId === buId; }).reduce(function(s,e){ return s+expenseUSD(e); },0);
   }
   function utilizationPct(buId){
     var bu = buMap()[buId]; if (!bu) return 0;
     return (spendForBU(buId) / bu.annualBudget) * 100;
   }
-  function totalSpend(){ return state.expenses.reduce(function(s,e){ return s+e.amount; },0); }
+  function totalSpend(){ return state.expenses.reduce(function(s,e){ return s+expenseUSD(e); },0); }
   function totalBudget(){ return state.businessUnits.reduce(function(s,b){ return s+b.annualBudget; },0); }
   function monthlyTotals(buId){
     var months = lastNMonths(6);
@@ -1550,7 +2007,7 @@
       var sum = state.expenses.filter(function(e){
         var d = new Date(e.date+"T00:00:00");
         return d.getFullYear()===m.year && d.getMonth()===m.month && (!buId || e.buId===buId);
-      }).reduce(function(s,e){ return s+e.amount; },0);
+      }).reduce(function(s,e){ return s+expenseUSD(e); },0);
       return { label:m.label, y:sum };
     });
   }
@@ -1572,9 +2029,166 @@
     return out;
   }
 
+  /* ============================== POLICY ASSISTANT ==============================
+     Keyword-matched Q&A over a small static policy knowledge base, plus two dynamic
+     lookups (per-diem for a named destination, budget/spend for a named Business
+     Unit) that read live app state. Deliberately not a general AI chat — same
+     "transparent heuristic" honesty as the rest of this demo. */
+  var POLICY_KB = [
+    { keywords:["per diem","per-diem","perdiem","daily allowance","daily limit"],
+      answer:"Per-diem is the daily allowance for lodging + meals at a destination. Finance sets a policy range per destination, and every new expense re-runs the recommendation engine against actual spend and hotel-rate trends — ask about a specific city (e.g. \"per-diem for Mumbai\") for the current number." },
+    { keywords:["category","categories","what can i expense","expense type","expense types"],
+      answer:"Tracked categories are Lodging, Meals, Transport, Airfare and Other. Pick whichever best matches — receipt scanning will also guess one for you from the bill text." },
+    { keywords:["approve","approval","reject","override","decide","decision","who approves","pending"],
+      answer:"Per-diem recommendations start Pending. Finance can Approve (accepts the AI-suggested range), Reject (keeps the current per-diem) or Override (sets a custom value) — every decision is written to the Audit Log, and a decided per-diem is excluded from future automatic recomputation." },
+    { keywords:["anomaly","unusual","flagged","outlier","suspicious"],
+      answer:"Expenses that sit well outside the normal range for their destination and category (a statistical outlier, over 2.2 standard deviations from the mean) are flagged \"Anomaly\" in the Transactions table and raise an alert for Finance to review — it doesn't block your submission." },
+    { keywords:["receipt","scan","upload","ocr","photo","bill","translate","translation","itemized","item"],
+      answer:"Upload a photo of your bill on the expense form and Amount, Date, Category, Bill No. and Location are auto-filled — pick the bill's language first if it isn't in English and it'll be translated before extraction. Itemized bills also get each line item detected so you can add them as separate expenses." },
+    { keywords:["how do i submit","submit an expense","add an expense","log an expense","file an expense"],
+      answer:"Go to Expenses (Finance) or Submit Expense (Employee), fill in or scan a receipt, and hit Submit. Business Unit and Project are always chosen by you — nothing is auto-selected for those two fields." },
+    { keywords:["login","sign in","directory","who can sign in","access","account"],
+      answer:"Sign-in is name-based for this demo — no password. Finance maintains who's allowed to sign in as what under Login Settings; if \"require known user\" is on, your name has to match an active entry there." },
+    { keywords:["project master","project budget","which project","project"],
+      answer:"Project Master tracks each project's budget by Business Unit / Department. Tag an expense to a project from the dropdown on the expense form, scoped to whichever Business Unit you've selected." },
+    { keywords:["forecast","projection","projected","trend"],
+      answer:"The Forecast tab projects the next 3 months of spend using a simple linear regression on the trailing 6 months, compared against the average monthly budget — it's a directional read, not a guarantee." },
+    { keywords:["contact","exception","who do i ask","help","alcohol","gift","personal"],
+      answer:"For anything outside standard policy (exceptions, alcohol, gifts, personal items), this demo's default guidance is: check with Finance before submitting — policy exceptions aren't something this assistant can approve." }
+  ];
+
+  function policyKeywordScore(q, kw){
+    var hits = 0;
+    kw.forEach(function(k){ if (q.indexOf(k) !== -1) hits += k.split(" ").length; });
+    return hits;
+  }
+
+  function answerPolicyQuery(raw){
+    var q = raw.toLowerCase().trim();
+    if (!q) return 'Ask me something like "per-diem for Tokyo" or "how does approval work?"';
+
+    var dest = state.destinations.find(function(d){ return q.indexOf(d.city.toLowerCase()) !== -1; });
+    if (dest){
+      var line = "The current per-diem for "+dest.city+", "+dest.country+" is "+money(dest.currentPerDiem)+"/day.";
+      line += dest.status === "pending"
+        ? " Finance is currently reviewing a proposed range of "+money(dest.recommendedLow)+"–"+money(dest.recommendedHigh)+" ("+dest.confidence+"% confidence)."
+        : " Status: "+dest.status+".";
+      return line;
+    }
+
+    var bu = state.businessUnits.find(function(b){ return q.indexOf(b.name.toLowerCase()) !== -1; });
+    if (bu && (q.indexOf("budget")!==-1 || q.indexOf("spend")!==-1 || q.indexOf("remaining")!==-1 || q.indexOf("left")!==-1 || q.indexOf("utiliz")!==-1)){
+      var spend = spendForBU(bu.id), p = utilizationPct(bu.id);
+      var openAlert = state.alerts.some(function(a){ return a.buId===bu.id && !a.acknowledged; });
+      var line2 = bu.name+" has spent "+money(spend)+" of its "+money(bu.annualBudget)+" annual T&E budget ("+pct(p)+" used).";
+      if (openAlert) line2 += " There's an open alert for this Business Unit — check Budgets & Alerts.";
+      return line2;
+    }
+
+    var best = null, bestScore = 0;
+    POLICY_KB.forEach(function(entry){
+      var score = policyKeywordScore(q, entry.keywords);
+      if (score > bestScore){ bestScore = score; best = entry; }
+    });
+    if (best) return best.answer;
+
+    return "I couldn't find a policy answer for that. Try asking about per-diem for a destination, budget for a Business Unit, expense categories, or how approvals work — for anything else, contact Finance.";
+  }
+
+  var POLICY_SAMPLES = [
+    "What's the per-diem for Tokyo?",
+    "How much budget does Engineering have left?",
+    "How does approval work?",
+    "What can I expense?",
+    "How do I scan a receipt?"
+  ];
+
+  function pushChatMessage(role, text){
+    var el = document.getElementById("policy-chat"); if (!el) return;
+    var msg = document.createElement("div");
+    msg.className = "chat-msg " + role;
+    msg.textContent = text;
+    el.appendChild(msg);
+    el.scrollTop = el.scrollHeight;
+  }
+
+  var policyChatSeeded = false;
+  function renderPolicyView(){
+    var samplesEl = document.getElementById("policy-samples");
+    if (samplesEl && !samplesEl.children.length){
+      samplesEl.innerHTML = POLICY_SAMPLES.map(function(q){ return '<button type="button" class="btn btn-sm btn-ghost" data-sample-q="'+esc(q)+'">'+esc(q)+'</button>'; }).join("");
+      samplesEl.querySelectorAll("[data-sample-q]").forEach(function(btn){
+        btn.addEventListener("click", function(){
+          document.getElementById("policy-input").value = btn.getAttribute("data-sample-q");
+          document.getElementById("policyForm").dispatchEvent(new Event("submit", {cancelable:true, bubbles:true}));
+        });
+      });
+    }
+    if (!policyChatSeeded){
+      policyChatSeeded = true;
+      pushChatMessage("bot", "Hi — ask me about per-diem limits, Business Unit budgets, expense categories, or how approvals work.");
+    }
+  }
+
+  function renderDigestView(){
+    if (state.role !== "finance") return;
+
+    var pending = state.destinations.filter(function(d){ return d.status === "pending"; });
+    document.getElementById("dg-perdiem-count").textContent = pending.length + " pending";
+    document.getElementById("dg-perdiem").innerHTML = pending.length ? pending.map(function(d){
+      return '<div class="alert-row"><div class="alert-body">'+
+        '<div class="alert-msg">'+esc(d.city)+', '+esc(d.country)+' — '+money(d.currentPerDiem)+' → '+money(d.recommendedLow)+'–'+money(d.recommendedHigh)+'</div>'+
+        '<div class="alert-meta">Confidence '+d.confidence+'%</div></div>'+
+        '<div style="display:flex; gap:6px; flex-wrap:wrap;">'+
+          '<button class="btn btn-sm btn-primary" data-dg-act="approve" data-dg-id="'+d.id+'">Approve</button>'+
+          '<button class="btn btn-sm btn-ghost" data-dg-act="reject" data-dg-id="'+d.id+'">Reject</button>'+
+          '<button class="btn btn-sm btn-ghost" data-dg-act="override" data-dg-id="'+d.id+'">Override…</button>'+
+        '</div></div>';
+    }).join("") : '<div class="empty">No per-diem recommendations pending.</div>';
+    document.querySelectorAll("[data-dg-act]").forEach(function(btn){
+      btn.addEventListener("click", function(){
+        var id = btn.getAttribute("data-dg-id"), act = btn.getAttribute("data-dg-act");
+        if (act === "approve") decideDestination(id, "approved");
+        else if (act === "reject") decideDestination(id, "rejected");
+        else openDestinationDrawer(id, true);
+      });
+    });
+
+    var myAlerts = state.alerts.filter(function(a){ return !a.acknowledged && canActOnBU(a.buId); })
+      .slice().sort(function(x,y){ return new Date(y.createdAt)-new Date(x.createdAt); });
+    document.getElementById("dg-alerts-count").textContent = myAlerts.length + " open";
+    document.getElementById("dg-alerts").innerHTML = myAlerts.length ? myAlerts.map(function(a){
+      return '<div class="alert-row"><div class="alert-body">'+
+        '<div class="alert-msg">'+statusChip(a.severity, a.type.replace(/_/g," "))+' '+esc(a.message)+'</div>'+
+        '<div class="alert-meta">'+(a.buId?esc(buName(a.buId))+' · ':'Organization · ')+timeAgo(a.createdAt)+'</div></div>'+
+        '<button class="btn btn-sm" data-dg-ack="'+a.id+'">Acknowledge</button></div>';
+    }).join("") : '<div class="empty">Nothing waiting on you.</div>';
+    document.querySelectorAll("[data-dg-ack]").forEach(function(btn){
+      btn.addEventListener("click", function(){ acknowledgeAlert(btn.getAttribute("data-dg-ack")); });
+    });
+
+    var secondEl = document.getElementById("dg-second");
+    if (currentUserBuId()){
+      document.getElementById("dg-second-count").textContent = "senior Finance only";
+      secondEl.innerHTML = '<div class="empty">Second-approval confirmation is limited to Finance users with no Business Unit assigned in the Login Directory.</div>';
+    } else {
+      var needsSecond = state.expenses.filter(function(e){ return e.needsSecondApproval && !e.secondApprovalConfirmed; });
+      document.getElementById("dg-second-count").textContent = needsSecond.length + " pending";
+      secondEl.innerHTML = needsSecond.length ? needsSecond.map(function(e){
+        return '<div class="alert-row"><div class="alert-body">'+
+          '<div class="alert-msg">'+esc(buName(e.buId))+' — '+esc(e.category)+' — '+moneyIn(e.amount, e.currency)+' ('+e.date+', '+esc(e.employee)+')</div>'+
+          '<div class="alert-meta">'+esc(destName(e.destinationId))+'</div></div>'+
+          '<button class="btn btn-sm btn-primary" data-dg-confirm2nd="'+e.id+'">Confirm</button></div>';
+      }).join("") : '<div class="empty">Nothing needs second approval right now.</div>';
+      secondEl.querySelectorAll("[data-dg-confirm2nd]").forEach(function(btn){
+        btn.addEventListener("click", function(){ confirmSecondApproval(btn.getAttribute("data-dg-confirm2nd")); });
+      });
+    }
+  }
+
   /* ============================== RENDERERS ============================== */
   function renderTabbar(){
-    var visible = TABS.filter(function(t){ return t.role === state.role; });
+    var visible = TABS.filter(function(t){ return t.role === state.role || t.role === "all"; });
     if (!visible.find(function(t){ return t.id===state.tab; })) state.tab = visible[0].id;
     var html = visible.map(function(t){
       return '<button class="tab-btn'+(t.id===state.tab?' active':'')+'" data-tab="'+t.id+'"><span class="tab-icon">'+t.icon+'</span>'+t.label+'</button>';
@@ -1587,7 +2201,8 @@
 
   function renderViews(){
     document.querySelectorAll(".view").forEach(function(v){
-      var isRole = v.getAttribute("data-role") === state.role;
+      var vr = v.getAttribute("data-role");
+      var isRole = vr === state.role || vr === "all";
       var isTab = v.id === "view-"+state.tab;
       v.hidden = !(isRole && isTab);
     });
@@ -1611,6 +2226,16 @@
     if (current && opts.some(function(p){ return p.id === current; })) sel.value = current;
   }
 
+  function updateDestPolicyHint(prefix){
+    var destEl = document.getElementById(prefix+"-dest");
+    var hintEl = document.getElementById(prefix+"-dest-policy");
+    if (!destEl || !hintEl) return;
+    var d = destMap()[destEl.value];
+    if (!d){ hintEl.textContent = ""; return; }
+    hintEl.textContent = "Policy: "+money(d.currentPerDiem)+"/day"+
+      (d.status === "pending" ? " — Finance reviewing "+money(d.recommendedLow)+"–"+money(d.recommendedHigh) : "");
+  }
+
   function fillDestinationSelects(){
     ["exp-dest","empexp-dest"].forEach(function(id){
       var el = document.getElementById(id); if (!el) return;
@@ -1618,6 +2243,8 @@
       el.innerHTML = state.destinations.map(function(d){ return '<option value="'+d.id+'">'+esc(d.city)+', '+esc(d.country)+'</option>'; }).join("");
       if (current) el.value = current;
     });
+    updateDestPolicyHint("exp");
+    updateDestPolicyHint("empexp");
     ["exp-bu","empexp-bu","proj-bu"].forEach(function(id){
       var el = document.getElementById(id); if (!el) return;
       var current = el.value;
@@ -1785,17 +2412,24 @@
     var list = state.alerts.filter(function(a){ return filter==="all" || !a.acknowledged; })
       .slice().sort(function(x,y){ return new Date(y.createdAt)-new Date(x.createdAt); });
     document.getElementById("alert-feed").innerHTML = list.length ? list.map(function(a){
-      var canAck = state.role==="finance" && !a.acknowledged;
+      var canAck = !a.acknowledged && canActOnBU(a.buId);
+      var delegated = !a.acknowledged && !canAck && state.role==="finance";
       return '<div class="alert-row"><div class="alert-body">'+
         '<div class="alert-msg'+(a.acknowledged?' alert-ack':'')+'">'+statusChip(a.severity, a.type.replace(/_/g," "))+' '+esc(a.message)+'</div>'+
         '<div class="alert-meta">'+(a.buId?esc(buName(a.buId))+' · ':'Organization · ')+(a.acknowledged? 'Acknowledged by '+esc(a.acknowledgedBy)+' · '+timeAgo(a.acknowledgedAt) : timeAgo(a.createdAt))+'</div>'+
-        '</div>'+(canAck? '<button class="btn btn-sm" data-ack="'+a.id+'">Acknowledge</button>' : '')+
+        '</div>'+(canAck? '<button class="btn btn-sm" data-ack="'+a.id+'">Acknowledge</button>' : (delegated ? '<span class="hint">'+esc(buName(a.buId))+' Finance only</span>' : ''))+
       '</div>';
     }).join("") : '<div class="empty">Nothing here.</div>';
 
     document.querySelectorAll("[data-ack]").forEach(function(btn){
       btn.addEventListener("click", function(){ acknowledgeAlert(btn.getAttribute("data-ack")); });
     });
+  }
+
+  function amountCellHtml(e){
+    var cur = e.currency || "USD";
+    if (cur === "USD") return '<td class="num">'+money(e.amount)+'</td>';
+    return '<td class="num">'+moneyIn(e.amount, cur)+'<br><span class="hint">≈ '+money(expenseUSD(e))+'</span></td>';
   }
 
   function renderExpensesView(){
@@ -1808,12 +2442,23 @@
     document.getElementById("exp-tbody").innerHTML = rows.length ? rows.map(function(e){
       var anomaly = flagged[e.id];
       var proj = projectName(e.projectId);
+      var flagsHtml = [];
+      if (anomaly) flagsHtml.push(statusChip("serious","Anomaly"));
+      if (e.needsSecondApproval){
+        if (e.secondApprovalConfirmed) flagsHtml.push('<span class="hint">2nd-approved by '+esc(e.secondApprovalBy)+'</span>');
+        else if (!currentUserBuId()) flagsHtml.push('<button class="btn btn-sm btn-primary" data-confirm2nd="'+e.id+'">Confirm 2nd approval</button>');
+        else flagsHtml.push(statusChip("warning","Needs 2nd approval"));
+      }
       return '<tr><td>'+e.date+'</td><td>'+esc(buName(e.buId))+'</td><td>'+(proj?esc(proj):'<span class="hint">—</span>')+'</td><td>'+esc(e.employee)+'</td><td>'+esc(destName(e.destinationId))+'</td>'+
         '<td>'+(e.location?esc(e.location):'<span class="hint">—</span>')+'</td><td>'+esc(e.category)+'</td>'+
         '<td>'+(e.billNo?esc(e.billNo):'<span class="hint">—</span>')+'</td>'+
-        '<td class="num">'+money(e.amount)+'</td>'+
-        '<td>'+(anomaly? statusChip("serious","Anomaly") : '')+'</td></tr>';
+        amountCellHtml(e)+
+        '<td><div style="display:flex; flex-direction:column; gap:4px; align-items:flex-start;">'+flagsHtml.join("")+'</div></td></tr>';
     }).join("") : '<tr><td colspan="10"><div class="empty">No transactions match this filter.</div></td></tr>';
+
+    document.querySelectorAll("[data-confirm2nd]").forEach(function(btn){
+      btn.addEventListener("click", function(){ confirmSecondApproval(btn.getAttribute("data-confirm2nd")); });
+    });
   }
 
   function renderForecastView(){
@@ -1853,7 +2498,7 @@
       .slice().sort(function(a,b){ return new Date(b.date)-new Date(a.date); }).slice(0,20);
     document.getElementById("myexp-tbody").innerHTML = mine.length ? mine.map(function(e){
       var proj = projectName(e.projectId);
-      return '<tr><td>'+e.date+'</td><td>'+(proj?esc(proj):'<span class="hint">—</span>')+'</td><td>'+esc(destName(e.destinationId))+'</td><td>'+esc(e.category)+'</td><td class="num">'+money(e.amount)+'</td></tr>';
+      return '<tr><td>'+e.date+'</td><td>'+(proj?esc(proj):'<span class="hint">—</span>')+'</td><td>'+esc(destName(e.destinationId))+'</td><td>'+esc(e.category)+'</td>'+amountCellHtml(e)+'</tr>';
     }).join("") : '<tr><td colspan="5"><div class="empty">No submissions yet under this name.</div></td></tr>';
   }
 
@@ -1925,6 +2570,7 @@
     fillDestinationSelects();
     document.getElementById("set-default-role").value = state.settings.defaultRole;
     document.getElementById("set-require-user").checked = !!state.settings.requireKnownUser;
+    document.getElementById("set-second-approval").value = state.settings.secondApprovalThreshold;
 
     var tbody = document.getElementById("user-tbody");
     var rows = state.users.slice().sort(function(a,b){ return a.name.localeCompare(b.name); });
@@ -1978,6 +2624,8 @@
     renderSyncPill();
     renderTabbar();
     renderViews();
+    renderPolicyView();
+    renderDigestView();
     renderOverview();
     renderPerDiemTable();
     renderMyPerDiem();
@@ -1992,16 +2640,46 @@
   }
 
   /* ============================== EVENTS ============================== */
+  document.getElementById("policyForm").addEventListener("submit", function(e){
+    e.preventDefault();
+    var input = document.getElementById("policy-input");
+    var q = input.value.trim();
+    if (!q) return;
+    pushChatMessage("user", q);
+    input.value = "";
+    pushChatMessage("bot", answerPolicyQuery(q));
+  });
+
   document.getElementById("roleSelect").addEventListener("change", function(e){
     state.role = e.target.value;
     var known = state.users.find(function(u){ return u.active && u.role === state.role; });
     state.actor = known ? known.name : (state.role === "employee" ? (state.businessUnits[0] ? state.businessUnits[0].employees[0] : "Employee") : "Finance Team");
     document.getElementById("actorInput").value = state.actor;
+    persistSession();
     renderAll();
   });
-  document.getElementById("actorInput").addEventListener("change", function(e){ state.actor = e.target.value || state.actor; renderAll(); });
+  document.getElementById("actorInput").addEventListener("change", function(e){ state.actor = e.target.value || state.actor; persistSession(); renderAll(); });
   document.getElementById("alertFilter").addEventListener("change", renderBudgetsView);
   document.getElementById("exp-filter-bu").addEventListener("change", renderExpensesView);
+
+  document.getElementById("exp-export-csv").addEventListener("click", function(){
+    var filterBu = document.getElementById("exp-filter-bu").value;
+    var flagged = anomalyIds();
+    var rows = state.expenses.filter(function(e){ return !filterBu || e.buId===filterBu; })
+      .slice().sort(function(a,b){ return new Date(b.date)-new Date(a.date); });
+    var headers = ["Date","Business Unit","Project","Employee","Destination","Location","Category","Bill No.","Amount","Currency","Amount (USD)","Anomaly"];
+    var data = rows.map(function(e){
+      return [e.date, buName(e.buId), projectName(e.projectId)||"", e.employee, destName(e.destinationId), e.location||"", e.category, e.billNo||"", e.amount, e.currency||"USD", Math.round(expenseUSD(e)), flagged[e.id]?"Yes":"No"];
+    });
+    downloadCSV("expense360-transactions.csv", headers, data);
+  });
+  document.getElementById("exp-export-print").addEventListener("click", function(){ window.print(); });
+  document.getElementById("audit-export-csv").addEventListener("click", function(){
+    var rows = state.auditLog.slice().sort(function(a,b){ return new Date(b.timestamp)-new Date(a.timestamp); });
+    var headers = ["When","Actor","Action","Target","Detail"];
+    var data = rows.map(function(a){ return [a.timestamp, a.actor, a.action, a.target, a.detail]; });
+    downloadCSV("expense360-audit-log.csv", headers, data);
+  });
   document.getElementById("forecastScope").addEventListener("change", renderForecastView);
 
   document.getElementById("projectForm").addEventListener("submit", function(e){
@@ -2058,35 +2736,75 @@
     persistSettings();
     updateActorWarn();
   });
+  document.getElementById("set-second-approval").addEventListener("change", function(e){
+    state.settings.secondApprovalThreshold = Math.max(0, +e.target.value || 0);
+    persistSettings();
+  });
 
+  document.getElementById("exp-dest").addEventListener("change", function(){ updateDestPolicyHint("exp"); });
+  document.getElementById("empexp-dest").addEventListener("change", function(){ updateDestPolicyHint("empexp"); });
   document.getElementById("exp-bu").addEventListener("change", function(){ fillProjectSelect("exp-project", "exp-bu"); });
   document.getElementById("empexp-bu").addEventListener("change", function(){ fillProjectSelect("empexp-project", "empexp-bu"); });
 
+  function wireMileageFields(prefix){
+    var catEl = document.getElementById(prefix+"-cat");
+    var wrapEl = document.getElementById(prefix+"-mileage-wrap");
+    var distEl = document.getElementById(prefix+"-distance");
+    var amtEl = document.getElementById(prefix+"-amount");
+    var curEl = document.getElementById(prefix+"-currency");
+    function recompute(){
+      if (catEl.value !== "Mileage") return;
+      var dist = +distEl.value || 0;
+      amtEl.value = (fromUSD(dist * MILEAGE_RATE_USD, curEl.value)).toFixed(2);
+    }
+    catEl.addEventListener("change", function(){
+      wrapEl.style.display = catEl.value === "Mileage" ? "block" : "none";
+      if (catEl.value === "Mileage") recompute();
+    });
+    distEl.addEventListener("input", recompute);
+    curEl.addEventListener("change", recompute);
+  }
+  wireMileageFields("exp");
+  wireMileageFields("empexp");
+
   document.getElementById("exp-receipt").addEventListener("change", function(evt){
-    handleReceiptUpload(evt, { status:"exp-receipt-status", preview:"exp-receipt-preview", amount:"exp-amount", date:"exp-date", cat:"exp-cat", dest:"exp-dest", billNo:"exp-billno", location:"exp-location", notes:"exp-notes" });
+    handleReceiptUpload(evt, { status:"exp-receipt-status", preview:"exp-receipt-preview", lang:"exp-receipt-lang", amount:"exp-amount", currency:"exp-currency", date:"exp-date", cat:"exp-cat", dest:"exp-dest", billNo:"exp-billno", location:"exp-location", notes:"exp-notes", itemsWrap:"exp-items-wrap", itemsList:"exp-items-list" });
   });
   document.getElementById("empexp-receipt").addEventListener("change", function(evt){
-    handleReceiptUpload(evt, { status:"empexp-receipt-status", preview:"empexp-receipt-preview", amount:"empexp-amount", date:"empexp-date", cat:"empexp-cat", dest:"empexp-dest", billNo:"empexp-billno", location:"empexp-location" });
+    handleReceiptUpload(evt, { status:"empexp-receipt-status", preview:"empexp-receipt-preview", lang:"empexp-receipt-lang", amount:"empexp-amount", currency:"empexp-currency", date:"empexp-date", cat:"empexp-cat", dest:"empexp-dest", billNo:"empexp-billno", location:"empexp-location", itemsWrap:"empexp-items-wrap", itemsList:"empexp-items-list" });
   });
+  document.getElementById("exp-items-add").addEventListener("click", function(){ addItemsFromPanel("exp"); });
+  document.getElementById("empexp-items-add").addEventListener("click", function(){ addItemsFromPanel("empexp"); });
 
   document.getElementById("expenseForm").addEventListener("submit", function(e){
     e.preventDefault();
-    addExpense({
+    var data = {
       buId: document.getElementById("exp-bu").value,
       destinationId: document.getElementById("exp-dest").value,
       projectId: document.getElementById("exp-project").value,
       category: document.getElementById("exp-cat").value,
       amount: +document.getElementById("exp-amount").value,
+      currency: document.getElementById("exp-currency").value,
       date: document.getElementById("exp-date").value || new Date().toISOString().slice(0,10),
       employee: document.getElementById("exp-employee").value,
       billNo: document.getElementById("exp-billno").value,
       location: document.getElementById("exp-location").value,
       notes: document.getElementById("exp-notes").value,
       submittedBy: document.getElementById("exp-employee").value
-    });
+    };
+    if (data.category === "Mileage"){
+      var dist = +document.getElementById("exp-distance").value;
+      if (dist > 0) data.distanceMiles = dist;
+    }
+    var dup = findPossibleDuplicate(data);
+    if (dup && !window.confirm("This looks similar to an expense from "+dup.date+" for "+moneyIn(dup.amount, dup.currency)+" — submit anyway?")) return;
+    addExpense(data);
     e.target.reset();
     document.getElementById("exp-receipt-status").textContent = "";
     document.getElementById("exp-receipt-preview").style.display = "none";
+    document.getElementById("exp-items-wrap").style.display = "none";
+    document.getElementById("exp-items-list").innerHTML = "";
+    document.getElementById("exp-mileage-wrap").style.display = "none";
   });
   document.getElementById("expenseFormEmp").addEventListener("submit", function(e){
     e.preventDefault();
@@ -2097,35 +2815,173 @@
       return;
     }
     errWrap.style.display = "none";
-    addExpense({
+    var empData = {
       buId: document.getElementById("empexp-bu").value,
       destinationId: document.getElementById("empexp-dest").value,
       projectId: document.getElementById("empexp-project").value,
       category: document.getElementById("empexp-cat").value,
       amount: +document.getElementById("empexp-amount").value,
+      currency: document.getElementById("empexp-currency").value,
       date: document.getElementById("empexp-date").value || new Date().toISOString().slice(0,10),
       employee: state.actor,
       billNo: document.getElementById("empexp-billno").value,
       location: document.getElementById("empexp-location").value,
       notes: "",
       submittedBy: state.actor
-    });
+    };
+    if (empData.category === "Mileage"){
+      var empDist = +document.getElementById("empexp-distance").value;
+      if (empDist > 0) empData.distanceMiles = empDist;
+    }
+    var empDup = findPossibleDuplicate(empData);
+    if (empDup && !window.confirm("This looks similar to an expense from "+empDup.date+" for "+moneyIn(empDup.amount, empDup.currency)+" — submit anyway?")) return;
+    addExpense(empData);
     e.target.reset();
     document.getElementById("empexp-receipt-status").textContent = "";
     document.getElementById("empexp-receipt-preview").style.display = "none";
+    document.getElementById("empexp-items-wrap").style.display = "none";
+    document.getElementById("empexp-items-list").innerHTML = "";
+    document.getElementById("empexp-mileage-wrap").style.display = "none";
+  });
+
+  /* ============================== LOGIN GATE ============================== */
+  var SESSION_KEY = "expense360-session";
+
+  function persistSession(){
+    try { sessionStorage.setItem(SESSION_KEY, JSON.stringify({ actor: state.actor, role: state.role })); } catch(e){}
+  }
+
+  var signupMode = false;
+  function setSignupMode(on){
+    signupMode = on;
+    document.getElementById("signup-bu-wrap").style.display = on ? "block" : "none";
+    document.getElementById("loginSubmitBtn").textContent = on ? "Create account & sign in" : "Sign in";
+    document.getElementById("loginToggleSignup").textContent = on ? "Already have an account? Sign in" : "New here? Create an account";
+    document.getElementById("loginModeLabel").textContent = on ? "Create your account" : "Sign in to continue";
+    if (on){
+      var sel = document.getElementById("signup-bu");
+      sel.innerHTML = '<option value="">No specific Business Unit</option>' +
+        state.businessUnits.map(function(b){ return '<option value="'+b.id+'">'+esc(b.name)+'</option>'; }).join("");
+    }
+  }
+
+  function showLoginScreen(){
+    document.getElementById("appShell").hidden = true;
+    document.getElementById("loginScreen").hidden = false;
+    try {
+      document.getElementById("login-name-list").innerHTML = (state.users || []).filter(function(u){ return u.active; })
+        .map(function(u){ return '<option value="'+esc(u.name)+'">'; }).join("");
+      document.getElementById("login-role").value = (state.settings && state.settings.defaultRole === "employee") ? "employee" : "finance";
+      document.getElementById("login-name").value = "";
+      document.getElementById("login-error").style.display = "none";
+      setSignupMode(false);
+      document.getElementById("login-name").focus();
+      document.getElementById("loginDiag").textContent = "App loaded OK (" + state.dbMode + " mode) — waiting for sign-in.";
+    } catch(e){
+      console.error("showLoginScreen failed to populate directory list", e);
+      document.getElementById("loginDiag").textContent = "App loaded with a warning: " + (e && e.message ? e.message : e) + " — the form below should still work.";
+      // the form itself is already visible and usable even if the name-suggestions list failed to fill in
+    }
+  }
+
+  function enterApp(actor, role){
+    state.actor = actor; state.role = role;
+    document.getElementById("roleSelect").value = role;
+    document.getElementById("actorInput").value = actor;
+    document.getElementById("loginScreen").hidden = true;
+    document.getElementById("appShell").hidden = false;
+    document.getElementById("main").style.opacity = "1";
+    try { persistSession(); } catch(e){ console.warn("persistSession failed", e); }
+    try {
+      renderAll();
+    } catch(e){
+      console.error("renderAll failed after sign-in", e);
+      document.getElementById("loginScreen").hidden = false;
+      document.getElementById("appShell").hidden = true;
+      var errEl = document.getElementById("login-error");
+      errEl.textContent = "Something went wrong loading the app after sign-in: " + (e && e.message ? e.message : e) + ". Try refreshing the page; if it keeps happening, note this message down.";
+      errEl.style.display = "block";
+    }
+  }
+
+  document.getElementById("login-name").addEventListener("input", function(e){
+    if (signupMode) return;
+    var name = e.target.value.trim().toLowerCase();
+    var match = state.users.find(function(u){ return u.active && u.name.trim().toLowerCase() === name; });
+    if (match) document.getElementById("login-role").value = match.role;
+  });
+
+  document.getElementById("loginToggleSignup").addEventListener("click", function(){
+    setSignupMode(!signupMode);
+    document.getElementById("login-error").style.display = "none";
+  });
+
+  document.getElementById("loginForm").addEventListener("submit", function(e){
+    e.preventDefault();
+    var errEl = document.getElementById("login-error");
+    try {
+      var name = document.getElementById("login-name").value.trim();
+      var role = document.getElementById("login-role").value;
+      if (!name){ errEl.textContent = "Enter your name to continue."; errEl.style.display = "block"; return; }
+
+      if (signupMode){
+        if (isKnownActiveUser(name, role)){
+          errEl.textContent = '"'+name+'" is already registered for that role — switch to "Sign in" instead.';
+          errEl.style.display = "block";
+          return;
+        }
+        var buId = document.getElementById("signup-bu").value;
+        var newUser = addRecord("users", "users", { name:name, role:role, buId:buId, active:true });
+        pushAudit("Self-registered via sign-in screen", name, (role==="finance"?"Finance / BU Leader":"Employee")+(buId?" · "+buName(buId):"")+".");
+        errEl.style.display = "none";
+        enterApp(newUser.name, newUser.role);
+        return;
+      }
+
+      if (state.settings.requireKnownUser && !isKnownActiveUser(name, role)){
+        errEl.textContent = '"'+name+'" is not an active user for that role in the Login Directory. Ask Finance to add you under Login Settings, or use "Create an account" below.';
+        errEl.style.display = "block";
+        return;
+      }
+      errEl.style.display = "none";
+      enterApp(name, role);
+    } catch(err){
+      console.error("sign-in failed", err);
+      errEl.textContent = "Sign-in failed: " + (err && err.message ? err.message : err) + ". Try refreshing the page; if it keeps happening, note this message down.";
+      errEl.style.display = "block";
+    }
+  });
+
+  document.getElementById("signOutBtn").addEventListener("click", function(){
+    try { sessionStorage.removeItem(SESSION_KEY); } catch(e){}
+    showLoginScreen();
   });
 
   /* ============================== BOOT ============================== */
   (async function boot(){
     document.getElementById("main").style.opacity = "0.45";
-    await initStore();
-    state.role = state.settings.defaultRole === "employee" ? "employee" : "finance";
-    var defaultUser = state.users.find(function(u){ return u.active && u.role === state.role; });
-    state.actor = defaultUser ? defaultUser.name : (state.role === "employee" ? (state.businessUnits[0] ? state.businessUnits[0].employees[0] : "Employee") : "Finance Team");
-    document.getElementById("roleSelect").value = state.role;
-    document.getElementById("actorInput").value = state.actor;
-    document.getElementById("main").style.opacity = "1";
-    renderAll();
+    try {
+      await initStore();
+      loadLiveFxRates(); // fire-and-forget: fallback rates work immediately, live rates refine once loaded
+
+      var restored = null;
+      try { restored = JSON.parse(sessionStorage.getItem(SESSION_KEY) || "null"); } catch(e){}
+
+      if (restored && restored.actor && restored.role){
+        enterApp(restored.actor, restored.role);
+      } else {
+        showLoginScreen();
+      }
+    } catch(err){
+      console.error("boot failed", err);
+      freshSeed();
+      state.dbMode = "local";
+      showLoginScreen();
+      var errEl = document.getElementById("login-error");
+      errEl.textContent = "Startup hit an error and fell back to a fresh local demo: " + (err && err.message ? err.message : err) + ". You can still sign in below.";
+      errEl.style.display = "block";
+      document.getElementById("loginDiag").textContent = "Startup error (see message above) — recovered with a fresh local demo.";
+    }
   })();
 
   if (window.claude && window.claude.hot){
