@@ -3351,6 +3351,11 @@
     try {
       await initStore();
       loadLiveFxRates(); // fire-and-forget: fallback rates work immediately, live rates refine once loaded
+      // Recording/demo aid: ?demo=overrun shrinks Engineering's budget (local mode only, never the shared workspace) so the Reallocation Engine has something to show.
+      if (state.dbMode === "local" && /[?&]demo=overrun/.test(location.search)){
+        var demoBu = buMap().engineering; if (demoBu) demoBu.annualBudget = 30000;
+        refreshAutomatedAlerts();
+      }
 
       var restored = null;
       try { restored = JSON.parse(sessionStorage.getItem(SESSION_KEY) || "null"); } catch(e){}
