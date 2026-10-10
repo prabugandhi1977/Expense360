@@ -2,24 +2,24 @@
 <meta name="description" content="Interactive demo of Expense360's AI per-diem optimizer, budget alerts, anomaly detection and spend forecasting for Finance and Business Unit leaders.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   /* ============================== TOKENS ============================== */
   :root{
     color-scheme: light;
-    --bg:            #E9E9E7;
+    --bg:            #EEF2F8;
     --surface:       #FFFFFF;
-    --surface-2:     #DEDEDB;
+    --surface-2:     #E4E9F1;
     --surface-raised: #FFFFFF;
-    --ink:           #142420;
-    --ink-2:         #48564F;
-    --ink-muted:     #808F86;
-    --border:        rgba(20,36,32,0.11);
-    --border-strong: rgba(20,36,32,0.20);
+    --ink:           #0f1b2d;
+    --ink-2:         #44546b;
+    --ink-muted:     #5f6e84;
+    --border:        rgba(15,27,45,0.12);
+    --border-strong: rgba(15,27,45,0.22);
 
-    --accent:        #1B6E67;
-    --accent-strong: #0E4B46;
-    --accent-soft:   #E2EFEC;
+    --accent:        #2563eb;
+    --accent-strong: #1d4ed8;
+    --accent-soft:   #E3ECFC;
     --gold:          #B8862E;
     --gold-soft:     #F5EBD6;
 
@@ -48,26 +48,26 @@
     --shadow-1: 0 1px 2px rgba(20,36,32,0.06), 0 1px 1px rgba(20,36,32,0.04);
     --shadow-2: 0 8px 24px rgba(20,36,32,0.14);
 
-    --font-display: 'Fraunces', ui-serif, Georgia, serif;
-    --font-body: 'IBM Plex Sans', system-ui, -apple-system, "Segoe UI", sans-serif;
-    --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+    --font-display: 'DM Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --font-body: 'DM Sans', system-ui, -apple-system, "Segoe UI", sans-serif;
+    --font-mono: 'DM Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
   }
   @media (prefers-color-scheme: dark){
     :root:not([data-theme="light"]){
       color-scheme: dark;
-      --bg:            #19191A;
-      --surface:       #212223;
-      --surface-2:     #2A2B2C;
-      --surface-raised:#262728;
-      --ink:           #EDF1EC;
-      --ink-2:         #C1CBC3;
-      --ink-muted:     #8B978F;
-      --border:        rgba(237,241,236,0.12);
-      --border-strong: rgba(237,241,236,0.22);
+      --bg:            #0a0d14;
+      --surface:       #111827;
+      --surface-2:     #1a2235;
+      --surface-raised:#141d2e;
+      --ink:           #e8edf5;
+      --ink-2:         #b6c3d6;
+      --ink-muted:     #8fa3bf;
+      --border:        #1f2d45;
+      --border-strong: #2c3e5c;
 
-      --accent:        #4CAE9F;
-      --accent-strong: #7BCABC;
-      --accent-soft:   rgba(76,174,159,0.16);
+      --accent:        #3b82f6;
+      --accent-strong: #7cb0fa;
+      --accent-soft:   rgba(59,130,246,0.16);
       --gold:          #D9A94A;
       --gold-soft:     rgba(217,169,74,0.14);
 
@@ -77,9 +77,9 @@
       --series-4: #c98500;
       --series-5: #d55181;
 
-      --chart-surface: #1a1a19;
-      --chart-grid:    #2c2c2a;
-      --chart-axis:    #383835;
+      --chart-surface: #0f1724;
+      --chart-grid:    #1f2d45;
+      --chart-axis:    #2c3e5c;
       --chart-text-2:  #c3c2b7;
       --chart-text-3:  #898781;
 
@@ -89,19 +89,19 @@
   }
   :root[data-theme="dark"]{
     color-scheme: dark;
-    --bg:            #19191A;
-    --surface:       #212223;
-    --surface-2:     #2A2B2C;
-    --surface-raised:#262728;
-    --ink:           #EDF1EC;
-    --ink-2:         #C1CBC3;
-    --ink-muted:     #8B978F;
-    --border:        rgba(237,241,236,0.12);
-    --border-strong: rgba(237,241,236,0.22);
+    --bg:            #0a0d14;
+    --surface:       #111827;
+    --surface-2:     #1a2235;
+    --surface-raised:#141d2e;
+    --ink:           #e8edf5;
+    --ink-2:         #b6c3d6;
+    --ink-muted:     #8fa3bf;
+    --border:        #1f2d45;
+    --border-strong: #2c3e5c;
 
-    --accent:        #4CAE9F;
-    --accent-strong: #7BCABC;
-    --accent-soft:   rgba(76,174,159,0.16);
+    --accent:        #3b82f6;
+    --accent-strong: #7cb0fa;
+    --accent-soft:   rgba(59,130,246,0.16);
     --gold:          #D9A94A;
     --gold-soft:     rgba(217,169,74,0.14);
 
@@ -111,9 +111,9 @@
     --series-4: #c98500;
     --series-5: #d55181;
 
-    --chart-surface: #1a1a19;
-    --chart-grid:    #2c2c2a;
-    --chart-axis:    #383835;
+    --chart-surface: #0f1724;
+    --chart-grid:    #1f2d45;
+    --chart-axis:    #2c3e5c;
     --chart-text-2:  #c3c2b7;
     --chart-text-3:  #898781;
 
@@ -365,7 +365,93 @@
     main{ max-width:none; padding:0; opacity:1!important; }
     .card{ box-shadow:none; border:1px solid #ccc; }
   }
+
+  /* ============================== COMMAND CENTER (Figma-inspired) ============================== */
+  .mono{ font-family:var(--font-mono); }
+  .stat-tile .label{ font-family:var(--font-mono); text-transform:uppercase; letter-spacing:.08em; font-size:.68rem; }
+  .stat-tile .value{ font-family:var(--font-mono); }
+  .brand-mark em{ background:linear-gradient(90deg,#3b82f6,#06b6d4); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+  .health-row{ display:flex; flex-direction:column; gap:4px; margin-bottom:12px; }
+  .health-row .hr-top{ display:flex; justify-content:space-between; font-size:.85rem; color:var(--ink-2); }
+  .health-row .hr-top b{ font-family:var(--font-mono); font-weight:500; color:var(--ink); }
+  .meter{ height:8px; border-radius:99px; background:var(--surface-2); overflow:hidden; }
+  .meter > span{ display:block; height:100%; border-radius:99px; }
+  .pill{ display:inline-block; padding:2px 9px; border-radius:99px; font-size:.72rem; font-weight:600; white-space:nowrap; }
+  .pill-over{ color:#ef4444; background:rgba(239,68,68,.12); }
+  .pill-watch{ color:#d98e04; background:rgba(245,158,11,.14); }
+  .pill-ok{ color:#0f9d6e; background:rgba(16,185,129,.13); }
+  .pill-idle{ color:#8b5cf6; background:rgba(139,92,246,.14); }
+  table.drill tbody tr.drill-row{ cursor:pointer; }
+  table.drill tbody tr.drill-row:hover td{ background:var(--surface-2); }
+  table.drill tbody tr.drill-row.sel td{ background:var(--accent-soft); }
+  .util-cell{ display:flex; align-items:center; gap:8px; min-width:130px; }
+  .util-cell .meter{ flex:1; height:6px; }
+  .crumbs{ display:flex; gap:6px; align-items:center; flex-wrap:wrap; font-size:.8rem; color:var(--ink-muted); margin-bottom:8px; }
+  .crumbs button{ background:none; border:0; padding:0; color:var(--accent); cursor:pointer; font:inherit; }
+  .insight{ border:1px solid var(--border); border-left-width:3px; border-radius:var(--radius-md); padding:12px 14px; margin-bottom:10px; background:var(--surface); }
+  .insight.sev-over{ border-left-color:#ef4444; } .insight.sev-watch{ border-left-color:#f59e0b; }
+  .insight.sev-idle{ border-left-color:#8b5cf6; } .insight.sev-ok{ border-left-color:#10b981; }
+  .insight h4{ margin:0 0 2px; font-size:.92rem; color:var(--ink); }
+  .insight p{ margin:0 0 8px; color:var(--ink-2); font-size:.85rem; }
+  .insight .actions{ display:flex; gap:8px; flex-wrap:wrap; }
+  .realloc-card{ display:flex; gap:14px; align-items:center; justify-content:space-between; flex-wrap:wrap; border:1px solid var(--border); border-radius:var(--radius-md); padding:14px 16px; margin-bottom:10px; background:var(--surface); }
+  .realloc-flow{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .realloc-flow .amt{ font-family:var(--font-mono); font-size:1.15rem; color:var(--accent-strong); }
+  .realloc-flow .arrow{ color:var(--ink-muted); }
+  .chat-prompts{ display:flex; gap:8px; flex-wrap:wrap; }
+  /* ---- landing ---- */
+  .landing{ position:fixed; inset:0; z-index:60; overflow-y:auto; background:var(--bg); color:var(--ink); }
+  .landing[hidden]{ display:none!important; }
+  .ld-nav{ display:flex; justify-content:space-between; align-items:center; padding:16px 32px; border-bottom:1px solid var(--border); gap:12px; flex-wrap:wrap; }
+  .ld-nav .ld-meta{ display:flex; gap:18px; align-items:center; color:var(--ink-muted); font-size:.85rem; }
+  .ld-hero{ text-align:center; padding:72px 20px 40px; }
+  .ld-badge{ display:inline-block; font-family:var(--font-mono); font-size:.75rem; padding:4px 12px; border-radius:99px; border:1px solid var(--border); background:var(--surface); color:#06b6d4; margin-bottom:22px; }
+  .ld-hero h1{ font-size:clamp(2.25rem,6vw,3.75rem); line-height:1.1; margin:0 auto 16px; max-width:760px; }
+  .ld-hero h1 span{ background:linear-gradient(90deg,#3b82f6,#06b6d4); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+  .ld-hero p{ color:var(--ink-muted); font-size:1.1rem; max-width:560px; margin:0 auto 28px; }
+  .ld-cta{ display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+  .ld-wrap{ max-width:1024px; margin:0 auto; padding:0 20px 40px; }
+  .ld-stats{ display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:14px; margin-bottom:28px; }
+  .ld-feats{ display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:14px; }
+  .ld-feat{ border:1px solid var(--border); background:var(--surface); border-radius:var(--radius-md); padding:18px; }
+  .ld-feat .ic{ color:var(--accent); font-size:1.2rem; }
+  .ld-feat h4{ margin:6px 0 4px; font-size:.98rem; }
+  .ld-feat p{ margin:0; color:var(--ink-2); font-size:.86rem; }
+  .ld-h2{ text-align:center; font-size:1.25rem; margin:36px 0 20px; }
+  @media (max-width:600px){ .ld-nav{ padding:12px 16px; } .ld-hero{ padding-top:44px; } }
 </style>
+
+<div class="landing" id="landing" hidden>
+  <div class="ld-nav">
+    <span class="brand-mark">Expense<em>360</em></span>
+    <div class="ld-meta"><span>Business Units &middot; T&amp;E</span><button type="button" class="btn btn-primary btn-sm" data-ld-enter>Open Dashboard &rarr;</button></div>
+  </div>
+  <div class="ld-hero">
+    <span class="ld-badge">&#9673; AI-powered &middot; live from your workspace</span>
+    <h1>Budget Command <span>Center</span></h1>
+    <p>See where the budget is going. Understand why. Predict what&rsquo;s next. Take action.</p>
+    <div class="ld-cta">
+      <button type="button" class="btn btn-primary" data-ld-enter>Open Dashboard</button>
+      <button type="button" class="btn btn-ghost" id="ld-tour">See how it works</button>
+    </div>
+  </div>
+  <div class="ld-wrap">
+    <div class="ld-stats" id="ld-stats"></div>
+    <div class="card" id="ld-actions-card">
+      <div class="card-head"><h3 id="ld-actions-title">Action Center</h3><button type="button" class="btn btn-sm btn-ghost" data-ld-enter>View all &rarr;</button></div>
+      <div id="ld-actions"></div>
+    </div>
+    <h2 class="ld-h2" id="ld-features-h">From data to decision &mdash; in one platform</h2>
+    <div class="ld-feats" id="ld-features">
+      <div class="ld-feat"><div class="ic">&#9672;</div><h4>Budget Health</h4><p>Budget vs. actual vs. projected across every Business Unit in one view.</p></div>
+      <div class="ld-feat"><div class="ic">&#9673;</div><h4>AI Insights</h4><p>Explains why spend is changing, not just what changed.</p></div>
+      <div class="ld-feat"><div class="ic">&#9681;</div><h4>Reallocation Engine</h4><p>Finds idle budget and moves it where it&rsquo;s needed &mdash; with Finance approval.</p></div>
+      <div class="ld-feat"><div class="ic">&#9680;</div><h4>Finance Copilot</h4><p>Ask in plain language and get answers from live data.</p></div>
+      <div class="ld-feat"><div class="ic">&#9635;</div><h4>Action Digest</h4><p>Not just alerts &mdash; decisions you can act on immediately.</p></div>
+      <div class="ld-feat"><div class="ic">&#9670;</div><h4>Drill-Down</h4><p>Business Unit &rarr; Category &rarr; Transaction without leaving the page.</p></div>
+    </div>
+  </div>
+</div>
 
 <div class="login-screen" id="loginScreen" hidden>
   <div class="login-card">
@@ -445,6 +531,20 @@
     <div class="stat-grid" id="ov-stats"></div>
     <div class="grid-2">
       <div class="card">
+        <div class="card-head"><h3>Budget health</h3><span class="hint" id="ov-health-sub"></span></div>
+        <div id="ov-health"></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h3>AI insights</h3><span class="hint">Why spend is changing, with next steps</span></div>
+        <div id="ov-insights"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><h3>Business Units</h3><span class="hint">Click a row to drill down: Business Unit &rarr; Category &rarr; Transactions</span></div>
+      <div id="ov-drill"></div>
+    </div>
+    <div class="grid-2">
+      <div class="card">
         <div class="card-head">
           <h3>Budget utilization by Business Unit</h3>
           <span class="hint">Spend to date vs. annual T&amp;E budget</span>
@@ -477,6 +577,24 @@
     </div>
   </section>
 
+  <!-- REALLOCATION ENGINE -->
+  <section class="view" id="view-realloc" data-role="finance">
+    <div class="view-head">
+      <div>
+        <h2>Reallocation Engine</h2>
+        <p>Idle budget in under-utilized Business Units, matched to units projected to overrun. Approving a move shifts annual T&amp;E budget between them and is written to the Audit Log. Senior Finance only.</p>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><h3>Suggested moves</h3><span class="hint" id="re-count"></span></div>
+      <div id="re-list"></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><h3>Recent reallocations</h3></div>
+      <div id="re-history"></div>
+    </div>
+  </section>
+
   <!-- ACTION DIGEST -->
   <section class="view" id="view-digest" data-role="finance">
     <div class="view-head">
@@ -503,8 +621,8 @@
   <section class="view" id="view-policy" data-role="all">
     <div class="view-head">
       <div>
-        <h2>Policy Assistant</h2>
-        <p>Ask about per-diem limits, Business Unit budgets, expense categories or how approvals work. Keyword-matched against the T&amp;E policy and live app data — not a general AI chat.</p>
+        <h2>Finance Copilot</h2>
+        <p>Ask about per-diem limits, Business Unit budgets, projected overruns, spend drivers or reallocation. Answers come from the T&amp;E policy and live app data via keyword matching — not a general AI chat.</p>
       </div>
     </div>
     <div class="card" style="padding:16px; display:flex; flex-direction:column; height:460px;">
@@ -516,7 +634,7 @@
     </div>
     <div class="card">
       <div class="card-head"><h3>Try asking</h3></div>
-      <div id="policy-samples" style="display:flex; gap:8px; flex-wrap:wrap;"></div>
+      <div id="policy-samples" class="chat-prompts"></div>
     </div>
   </section>
 
@@ -1147,7 +1265,8 @@
   var TABS = [
     { id:"overview", label:"Overview", role:"finance", icon:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1.5" y="8.5" width="3" height="6"/><rect x="6.5" y="4.5" width="3" height="10"/><rect x="11.5" y="1.5" width="3" height="13"/></svg>' },
     { id:"digest", label:"Action Digest", role:"finance", icon:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 1.6a4.4 4.4 0 0 0-4.4 4.4v2.4L2.2 11h11.6l-1.4-2.6V6a4.4 4.4 0 0 0-4.4-4.4Z"/><path d="M6.2 12.8a1.8 1.8 0 0 0 3.6 0"/></svg>' },
-    { id:"policy", label:"Policy Assistant", role:"all", icon:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 3.2h12v7.6H6.8L3.2 13.6V10.8H2Z"/><path d="M5 6.2h6M5 8.4h4"/></svg>' },
+    { id:"policy", label:"Finance Copilot", role:"all", icon:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 3.2h12v7.6H6.8L3.2 13.6V10.8H2Z"/><path d="M5 6.2h6M5 8.4h4"/></svg>' },
+    { id:"realloc", label:"Reallocation", role:"finance", icon:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 5h10M9.5 2.5 12 5l-2.5 2.5M14 11H4M6.5 8.5 4 11l2.5 2.5"/></svg>' },
     { id:"perdiem", label:"Per-Diem", role:"finance", icon:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6.3"/><path d="M8 4.6v3.6l2.4 1.4"/></svg>' },
     { id:"myperdiem", label:"My Per Diem", role:"employee", icon:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6.3"/><path d="M8 4.6v3.6l2.4 1.4"/></svg>' },
     { id:"budgets", label:"Budgets & Alerts", role:"finance", icon:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 1.6 14.4 5v6L8 14.4 1.6 11V5Z"/><path d="M8 6v2.6l1.8 1"/></svg>' },
@@ -2067,6 +2186,9 @@
     var q = raw.toLowerCase().trim();
     if (!q) return 'Ask me something like "per-diem for Tokyo" or "how does approval work?"';
 
+    var fin = copilotFinanceAnswer(q);
+    if (fin) return fin;
+
     var dest = state.destinations.find(function(d){ return q.indexOf(d.city.toLowerCase()) !== -1; });
     if (dest){
       var line = "The current per-diem for "+dest.city+", "+dest.country+" is "+money(dest.currentPerDiem)+"/day.";
@@ -2095,6 +2217,12 @@
     return "I couldn't find a policy answer for that. Try asking about per-diem for a destination, budget for a Business Unit, expense categories, or how approvals work — for anything else, contact Finance.";
   }
 
+  var FINANCE_SAMPLES = [
+    "Which business is likely to exceed budget this quarter?",
+    "Why is Lodging spend higher than last quarter?",
+    "Where can I reallocate budget?",
+    "Show Airfare spending"
+  ];
   var POLICY_SAMPLES = [
     "What's the per-diem for Tokyo?",
     "How much budget does Engineering have left?",
@@ -2112,11 +2240,13 @@
     el.scrollTop = el.scrollHeight;
   }
 
-  var policyChatSeeded = false;
+  var policyChatSeeded = false, policySamplesRole = "";
   function renderPolicyView(){
     var samplesEl = document.getElementById("policy-samples");
-    if (samplesEl && !samplesEl.children.length){
-      samplesEl.innerHTML = POLICY_SAMPLES.map(function(q){ return '<button type="button" class="btn btn-sm btn-ghost" data-sample-q="'+esc(q)+'">'+esc(q)+'</button>'; }).join("");
+    if (samplesEl && policySamplesRole !== state.role){
+      policySamplesRole = state.role;
+      var list = (state.role === "finance" ? FINANCE_SAMPLES : []).concat(POLICY_SAMPLES);
+      samplesEl.innerHTML = list.map(function(q){ return '<button type="button" class="btn btn-sm btn-ghost" data-sample-q="'+esc(q)+'">'+esc(q)+'</button>'; }).join("");
       samplesEl.querySelectorAll("[data-sample-q]").forEach(function(btn){
         btn.addEventListener("click", function(){
           document.getElementById("policy-input").value = btn.getAttribute("data-sample-q");
@@ -2126,7 +2256,13 @@
     }
     if (!policyChatSeeded){
       policyChatSeeded = true;
-      pushChatMessage("bot", "Hi — ask me about per-diem limits, Business Unit budgets, expense categories, or how approvals work.");
+      var greet = "Hi — ask me about per-diem limits, Business Unit budgets, expense categories, or how approvals work.";
+      if (state.role === "finance" && state.businessUnits.length){
+        var over = state.businessUnits.map(buHealth).filter(function(r){ return r.status === "over"; });
+        greet = "Hi "+(state.actor||"there")+" — "+pct(totalSpend()/totalBudget()*100)+" of the annual T&E budget is used. "+
+          (over.length ? over.map(function(r){ return r.bu.name; }).join(", ")+" "+(over.length>1?"are":"is")+" projected to overrun. Want the key drivers?" : "No Business Unit is projected to overrun.");
+      }
+      pushChatMessage("bot", greet);
     }
   }
 
@@ -2184,6 +2320,227 @@
         btn.addEventListener("click", function(){ confirmSecondApproval(btn.getAttribute("data-dg-confirm2nd")); });
       });
     }
+  }
+
+
+  /* ============================== BUDGET COMMAND CENTER ==============================
+     Derived views over the existing data: budget health, BU > category > transaction
+     drill-down, driver-based insights and the reallocation engine. Everything is
+     computed from current expenses/budgets, so it moves as soon as a new expense lands. */
+  var ovDrill = { bu:"", cat:"" };
+
+  function projectedAnnual(buId){
+    var monthly = monthlyTotals(buId).filter(function(m){ return m.y > 0; });
+    if (!monthly.length) return 0;
+    return monthly.reduce(function(s,m){ return s+m.y; },0) / monthly.length * 12;
+  }
+  function buHealth(b){
+    var spent = spendForBU(b.id), proj = projectedAnnual(b.id);
+    var projPct = b.annualBudget ? proj / b.annualBudget * 100 : 0;
+    var status = projPct > 103 ? "over" : projPct >= 90 ? "watch" : projPct < 60 ? "idle" : "ok";
+    return { bu:b, spent:spent, proj:proj, util:b.annualBudget ? spent/b.annualBudget*100 : 0, projPct:projPct, status:status };
+  }
+  var HEALTH_LABEL = { over:"Over budget", watch:"Watch", ok:"Healthy", idle:"Under-utilized" };
+  function healthPill(st){ return '<span class="pill pill-'+st+'">'+HEALTH_LABEL[st]+'</span>'; }
+  function meterColor(p){ return p > 100 ? "#ef4444" : p > 85 ? "#f59e0b" : "#10b981"; }
+
+  function categoryTotals(buId, months){
+    var out = {};
+    CATEGORIES.forEach(function(c){ out[c] = 0; });
+    state.expenses.forEach(function(e){
+      if (buId && e.buId !== buId) return;
+      var d = new Date(e.date+"T00:00:00");
+      var inRange = months.some(function(m){ return d.getFullYear()===m.year && d.getMonth()===m.month; });
+      if (inRange) out[e.category] = (out[e.category]||0) + expenseUSD(e);
+    });
+    return out;
+  }
+  // The category whose spend grew most between the earlier and later half of the 6-month window.
+  function topDriver(buId){
+    var months = lastNMonths(6);
+    var prev = categoryTotals(buId, months.slice(0,3)), cur = categoryTotals(buId, months.slice(3));
+    var best = null;
+    CATEGORIES.forEach(function(c){
+      var delta = cur[c] - prev[c];
+      if (!best || delta > best.delta) best = { cat:c, delta:delta, pct: prev[c] ? delta/prev[c]*100 : null };
+    });
+    return best && best.delta > 0 ? best : null;
+  }
+
+  function renderOverviewExtras(){
+    var rows = state.businessUnits.map(buHealth);
+    var budget = totalBudget(), spent = totalSpend();
+    var consumed = budget ? spent/budget*100 : 0;
+    var projTotal = rows.reduce(function(s,r){ return s+r.proj; },0);
+    var projPct = budget ? projTotal/budget*100 : 0;
+    document.getElementById("ov-health-sub").textContent = "6 of 12 months tracked";
+    document.getElementById("ov-health").innerHTML = [
+      { label:"Budget consumed", pct:consumed, color:"#3b82f6" },
+      { label:"Time elapsed", pct:50, color:"#f59e0b" },
+      { label:"Projected year-end", pct:projPct, color:meterColor(projPct) }
+    ].map(function(r){
+      return '<div class="health-row"><div class="hr-top"><span>'+r.label+'</span><b>'+Math.round(r.pct)+'%</b></div>'+
+        '<div class="meter"><span style="width:'+Math.min(100,r.pct)+'%; background:'+r.color+';"></span></div></div>';
+    }).join("") + '<p class="hint" style="margin:6px 0 0;">'+(projPct > 100
+      ? "At the current run-rate the organization lands "+money(projTotal-budget)+" over its annual T&amp;E budget."
+      : "At the current run-rate the organization lands "+money(budget-projTotal)+" under its annual T&amp;E budget.")+'</p>';
+
+    // Insights: overruns first, then idle budget, each with the category driving the change.
+    var order = { over:0, watch:1, idle:2, ok:3 };
+    var flagged = rows.filter(function(r){ return r.status !== "ok"; })
+      .sort(function(a,b){ return order[a.status]-order[b.status] || b.projPct-a.projPct; }).slice(0,4);
+    document.getElementById("ov-insights").innerHTML = flagged.length ? flagged.map(function(r){
+      var drv = topDriver(r.bu.id), title, body, btn;
+      if (r.status === "over" || r.status === "watch"){
+        title = r.bu.name+(r.status==="over" ? " is projected to exceed budget by "+money(r.proj-r.bu.annualBudget) : " is on course to use "+Math.round(r.projPct)+"% of budget");
+        body = drv ? drv.cat+" spend is up "+money(drv.delta)+(drv.pct!=null ? " ("+Math.round(drv.pct)+"%)" : "")+" over the last 3 months vs. the 3 before — the main driver." : "Spend is running above plan with no single category standing out.";
+        btn = r.status==="over" ? '<button class="btn btn-sm btn-primary" data-ov-go="realloc">Find budget</button>' : "";
+      } else {
+        title = r.bu.name+" has ~"+money(r.bu.annualBudget-r.proj)+" projected unused";
+        body = "Only "+Math.round(r.projPct)+"% of the annual budget is on pace to be used — a candidate to fund units that are overrunning.";
+        btn = '<button class="btn btn-sm btn-primary" data-ov-go="realloc">Reallocate</button>';
+      }
+      return '<div class="insight sev-'+r.status+'"><h4>'+esc(title)+'</h4><p>'+esc(body)+'</p><div class="actions">'+btn+
+        '<button class="btn btn-sm btn-ghost" data-ov-drill="'+r.bu.id+'">Drill down</button></div></div>';
+    }).join("") : '<div class="empty">All Business Units are on a healthy run-rate.</div>';
+
+    // Drill-down: BU table -> category table -> transactions.
+    var html = '<div class="table-scroll"><table class="drill"><thead><tr><th>Business Unit</th><th class="num">Budget</th><th class="num">Spent</th><th class="num">Projected</th><th>Utilization</th><th>Status</th></tr></thead><tbody>'+
+      rows.map(function(r){
+        return '<tr class="drill-row'+(ovDrill.bu===r.bu.id?' sel':'')+'" data-drill-bu="'+r.bu.id+'"><td><strong>'+esc(r.bu.name)+'</strong></td>'+
+          '<td class="num">'+money(r.bu.annualBudget)+'</td><td class="num">'+money(r.spent)+'</td><td class="num">'+money(r.proj)+'</td>'+
+          '<td><div class="util-cell"><div class="meter"><span style="width:'+Math.min(100,r.util)+'%; background:'+meterColor(r.projPct)+';"></span></div><span class="mono">'+Math.round(r.util)+'%</span></div></td>'+
+          '<td>'+healthPill(r.status)+'</td></tr>';
+      }).join("") + '</tbody></table></div>';
+
+    if (ovDrill.bu && buMap()[ovDrill.bu]){
+      var bu = buMap()[ovDrill.bu];
+      var tot = categoryTotals(bu.id, lastNMonths(6));
+      var all = CATEGORIES.map(function(c){ return { cat:c, v:tot[c]||0 }; }).filter(function(x){ return x.v > 0; }).sort(function(a,b){ return b.v-a.v; });
+      var sum = all.reduce(function(s,x){ return s+x.v; },0) || 1;
+      html += '<div class="crumbs" style="margin-top:16px;"><button data-drill-clear>All Business Units</button> / <strong style="color:var(--ink);">'+esc(bu.name)+'</strong>'+
+        (ovDrill.cat ? ' / <button data-drill-bu="'+bu.id+'">Categories</button> / <strong style="color:var(--ink);">'+esc(ovDrill.cat)+'</strong>' : '')+'</div>';
+      if (!ovDrill.cat){
+        html += '<div class="table-scroll"><table class="drill"><thead><tr><th>Category</th><th class="num">Spent</th><th>Share</th><th class="num">Last 3 mo</th><th class="num">Prior 3 mo</th></tr></thead><tbody>'+
+          all.map(function(x){
+            var months = lastNMonths(6);
+            var cur = categoryTotals(bu.id, months.slice(3))[x.cat], prev = categoryTotals(bu.id, months.slice(0,3))[x.cat];
+            return '<tr class="drill-row" data-drill-cat="'+x.cat+'"><td><strong>'+x.cat+'</strong></td><td class="num">'+money(x.v)+'</td>'+
+              '<td><div class="util-cell"><div class="meter"><span style="width:'+(x.v/sum*100)+'%; background:var(--accent);"></span></div><span class="mono">'+Math.round(x.v/sum*100)+'%</span></div></td>'+
+              '<td class="num">'+money(cur)+'</td><td class="num">'+money(prev)+'</td></tr>';
+          }).join("") + '</tbody></table></div>';
+      } else {
+        var tx = state.expenses.filter(function(e){ return e.buId===bu.id && e.category===ovDrill.cat; })
+          .sort(function(a,b){ return expenseUSD(b)-expenseUSD(a); }).slice(0,10);
+        html += '<div class="table-scroll"><table class="drill"><thead><tr><th>Date</th><th>Employee</th><th>Destination</th><th class="num">Amount</th></tr></thead><tbody>'+
+          (tx.length ? tx.map(function(e){
+            return '<tr><td>'+esc(e.date)+'</td><td>'+esc(e.employee)+'</td><td>'+esc(destName(e.destinationId))+'</td><td class="num">'+moneyIn(e.amount, e.currency)+'</td></tr>';
+          }).join("") : '<tr><td colspan="4" class="empty">No transactions.</td></tr>') + '</tbody></table></div>' +
+          '<p class="hint" style="margin-top:6px;">Ten largest transactions. Full list and filters are under Expenses.</p>';
+      }
+    }
+    var el = document.getElementById("ov-drill");
+    el.innerHTML = html;
+    el.querySelectorAll("[data-drill-bu]").forEach(function(n){
+      n.addEventListener("click", function(){
+        var id = n.getAttribute("data-drill-bu");
+        ovDrill = (n.tagName === "TR" && ovDrill.bu === id && !ovDrill.cat) ? { bu:"", cat:"" } : { bu:id, cat:"" };
+        renderOverviewExtras();
+      });
+    });
+    el.querySelectorAll("[data-drill-cat]").forEach(function(n){
+      n.addEventListener("click", function(){ ovDrill.cat = n.getAttribute("data-drill-cat"); renderOverviewExtras(); });
+    });
+    var clr = el.querySelector("[data-drill-clear]");
+    if (clr) clr.addEventListener("click", function(){ ovDrill = { bu:"", cat:"" }; renderOverviewExtras(); });
+    document.querySelectorAll("[data-ov-go]").forEach(function(n){
+      n.addEventListener("click", function(){ state.tab = n.getAttribute("data-ov-go"); renderAll(); window.scrollTo({top:0, behavior:"smooth"}); });
+    });
+    document.querySelectorAll("[data-ov-drill]").forEach(function(n){
+      n.addEventListener("click", function(){
+        ovDrill = { bu:n.getAttribute("data-ov-drill"), cat:"" }; renderOverviewExtras();
+        document.getElementById("ov-drill").scrollIntoView({behavior:"smooth", block:"start"});
+      });
+    });
+  }
+
+  /* ---- Reallocation engine ---- */
+  var dismissedMoves = {};
+  function suggestMoves(){
+    var rows = state.businessUnits.map(buHealth);
+    var donors = rows.filter(function(r){ return r.status === "idle" || (r.status === "ok" && r.projPct < 75); })
+      .map(function(r){ return { r:r, spare: Math.max(0, r.bu.annualBudget - r.proj*1.15) }; })
+      .filter(function(d){ return d.spare > 500; }).sort(function(a,b){ return b.spare-a.spare; });
+    var needy = rows.filter(function(r){ return r.status === "over"; }).sort(function(a,b){ return (b.proj-b.bu.annualBudget)-(a.proj-a.bu.annualBudget); });
+    var moves = [];
+    needy.forEach(function(n){
+      var gap = n.proj - n.bu.annualBudget;
+      donors.forEach(function(d){
+        if (gap <= 500 || d.spare <= 500) return;
+        var amt = Math.round(Math.min(gap, d.spare) / 500) * 500;
+        if (amt <= 0) return;
+        d.spare -= amt; gap -= amt;
+        moves.push({ key:d.r.bu.id+">"+n.bu.id, from:d.r, to:n, amt:amt });
+      });
+    });
+    return moves;
+  }
+  function applyMove(m){
+    var from = buMap()[m.from.bu.id], to = buMap()[m.to.bu.id];
+    if (!from || !to || currentUserBuId()) return;
+    from.annualBudget -= m.amt; to.annualBudget += m.amt;
+    persist("businessUnits", "update", from.id, { annualBudget: from.annualBudget });
+    persist("businessUnits", "update", to.id, { annualBudget: to.annualBudget });
+    pushAudit("Reallocated budget", from.name+" → "+to.name, "Moved "+money(m.amt)+" of annual T&E budget ("+from.name+" now "+money(from.annualBudget)+", "+to.name+" now "+money(to.annualBudget)+").");
+    refreshAutomatedAlerts();
+    renderAll();
+  }
+  function renderRealloc(){
+    if (state.role !== "finance") return;
+    var senior = !currentUserBuId();
+    var moves = suggestMoves().filter(function(m){ return !dismissedMoves[m.key]; });
+    document.getElementById("re-count").textContent = moves.length + " suggested";
+    var list = document.getElementById("re-list");
+    list.innerHTML = (senior ? "" : '<p class="hint" style="margin:0 0 10px;">You are delegated to a single Business Unit; moving budget between units needs senior Finance.</p>') +
+      (moves.length ? moves.map(function(m, i){
+        return '<div class="realloc-card"><div><div class="realloc-flow"><strong>'+esc(m.from.bu.name)+'</strong><span class="arrow">→</span><strong>'+esc(m.to.bu.name)+'</strong><span class="amt">'+money(m.amt)+'</span></div>'+
+          '<div class="hint" style="margin-top:4px;">'+esc(m.from.bu.name)+' is on pace for '+Math.round(m.from.projPct)+'% of budget; '+esc(m.to.bu.name)+' for '+Math.round(m.to.projPct)+'%.</div></div>'+
+          '<div style="display:flex; gap:8px;"><button class="btn btn-sm btn-primary" data-re-ok="'+i+'"'+(senior?'':' disabled')+'>Approve move</button>'+
+          '<button class="btn btn-sm btn-ghost" data-re-no="'+i+'">Dismiss</button></div></div>';
+      }).join("") : '<div class="empty">No reallocation needed — no Business Unit is projected to overrun while another has idle budget.</div>');
+    list.querySelectorAll("[data-re-ok]").forEach(function(b){ b.addEventListener("click", function(){ applyMove(moves[+b.getAttribute("data-re-ok")]); }); });
+    list.querySelectorAll("[data-re-no]").forEach(function(b){ b.addEventListener("click", function(){ dismissedMoves[moves[+b.getAttribute("data-re-no")].key] = true; renderRealloc(); }); });
+
+    var hist = state.auditLog.filter(function(a){ return a.action === "Reallocated budget"; }).slice(0,8);
+    document.getElementById("re-history").innerHTML = hist.length ? hist.map(function(a){
+      return '<div class="alert-row"><div class="alert-body"><div class="alert-msg">'+esc(a.target)+' — '+esc(a.detail)+'</div><div class="alert-meta">'+esc(a.actor)+' · '+timeAgo(a.timestamp)+'</div></div></div>';
+    }).join("") : '<div class="empty">No reallocations yet.</div>';
+  }
+
+  /* ---- Copilot: live finance lookups ---- */
+  function copilotFinanceAnswer(q){
+    if (state.role !== "finance") return null;
+    var rows = state.businessUnits.map(buHealth);
+    if (/(exceed|overrun|over budget|overspend|likely)/.test(q) && /(budget|business|unit|exceed|overrun|overspend)/.test(q)){
+      var over = rows.filter(function(r){ return r.status === "over"; }).sort(function(a,b){ return b.projPct-a.projPct; });
+      if (!over.length) return "No Business Unit is projected to exceed its annual T&E budget at the current run-rate.";
+      return "Projected to exceed budget: "+over.map(function(r){ return r.bu.name+" (~"+money(r.proj-r.bu.annualBudget)+" over, "+Math.round(r.projPct)+"% of budget)"; }).join("; ")+".";
+    }
+    if (/(realloc|idle|unused|move budget|spare)/.test(q)){
+      var mv = suggestMoves();
+      if (!mv.length) return "Nothing to reallocate right now — no overrun to fund, or no idle budget to draw from.";
+      return "Suggested: "+mv.slice(0,3).map(function(m){ return money(m.amt)+" from "+m.from.bu.name+" to "+m.to.bu.name; }).join("; ")+". Review and approve under Reallocation.";
+    }
+    var cat = CATEGORIES.find(function(c){ return q.indexOf(c.toLowerCase()) !== -1; }) || (q.indexOf("travel")!==-1 ? "Airfare" : null);
+    if (cat && /(why|higher|increase|up|grow|driver|trend|show|spend|spending)/.test(q)){
+      var months = lastNMonths(6);
+      var cur = categoryTotals("", months.slice(3))[cat], prev = categoryTotals("", months.slice(0,3))[cat];
+      var chg = prev ? Math.round((cur-prev)/prev*100) : null;
+      var byBu = state.businessUnits.map(function(b){ return { n:b.name, v:categoryTotals(b.id, months.slice(3))[cat] - categoryTotals(b.id, months.slice(0,3))[cat] }; }).sort(function(a,b){ return b.v-a.v; });
+      return cat+" spend is "+money(cur)+" over the last 3 months vs. "+money(prev)+" in the 3 before"+(chg!=null ? " ("+(chg>=0?"+":"")+chg+"%)" : "")+
+        ". Biggest mover: "+byBu[0].n+" ("+(byBu[0].v>=0?"+":"-")+money(Math.abs(byBu[0].v))+")."+(cat==="Airfare" && q.indexOf("travel")!==-1 ? " (Travel mapped to Airfare.)" : "");
+    }
+    return null;
   }
 
   /* ============================== RENDERERS ============================== */
@@ -2283,6 +2640,7 @@
       { label:"Pending recommendations", value: pending.length, delta: state.destinations.length+" destinations tracked" }
     ].map(function(s){ return '<div class="stat-tile"><span class="label">'+esc(s.label)+'</span><span class="value">'+s.value+'</span><span class="delta">'+esc(s.delta)+'</span></div>'; }).join("");
 
+    renderOverviewExtras();
     renderBudgetBars(document.getElementById("ov-budget-chart"));
 
     var monthly = monthlyTotals(null);
@@ -2627,6 +2985,7 @@
     renderPolicyView();
     renderDigestView();
     renderOverview();
+    renderRealloc();
     renderPerDiemTable();
     renderMyPerDiem();
     renderBudgetsView();
@@ -2865,9 +3224,38 @@
     }
   }
 
+  var landingSeen = false;
+  function renderLanding(){
+    var rows = state.businessUnits.map(buHealth);
+    var budget = totalBudget(), spent = totalSpend();
+    var proj = rows.reduce(function(s,r){ return s+r.proj; },0);
+    var flagged = rows.filter(function(r){ return r.status === "over" || r.status === "watch"; });
+    document.getElementById("ld-stats").innerHTML = [
+      { label:"Annual budget", value:money(budget), sub:"T&E, all units", color:"#3b82f6" },
+      { label:"Spent", value:money(spent), sub:(budget?pct(spent/budget*100):"0%")+" consumed", color:"#10b981" },
+      { label:"Projected", value:money(proj), sub:proj>budget ? "↑ "+money(proj-budget)+" over budget" : money(budget-proj)+" under budget", color:proj>budget ? "#ef4444" : "#10b981" },
+      { label:"Business Units", value:String(rows.length), sub:flagged.length+" need attention", color:"#f59e0b" }
+    ].map(function(t){ return '<div class="stat-tile"><span class="label">'+t.label+'</span><span class="value" style="color:'+t.color+';">'+esc(t.value)+'</span><span class="delta">'+esc(t.sub)+'</span></div>'; }).join("");
+    var openAlerts = state.alerts.filter(function(a){ return !a.acknowledged && a.severity !== "good"; });
+    document.getElementById("ld-actions-title").textContent = "Action Center — "+openAlerts.length+" item"+(openAlerts.length===1?"":"s")+" require attention";
+    document.getElementById("ld-actions").innerHTML = openAlerts.length ? openAlerts.slice(0,3).map(function(a){
+      return '<div class="alert-row"><div class="alert-body"><div class="alert-msg">'+statusChip(a.severity, a.severity)+' '+esc(a.message)+'</div><div class="alert-meta">'+(a.buId?esc(buName(a.buId))+' · ':'')+timeAgo(a.createdAt)+'</div></div></div>';
+    }).join("") : '<div class="empty">No open alerts — all clear.</div>';
+  }
+  function enterFromLanding(){
+    landingSeen = true;
+    document.getElementById("landing").hidden = true;
+    var n = document.getElementById("login-name"); if (n) n.focus();
+  }
+  document.querySelectorAll("[data-ld-enter]").forEach(function(b){ b.addEventListener("click", enterFromLanding); });
+  document.getElementById("ld-tour").addEventListener("click", function(){ document.getElementById("ld-features-h").scrollIntoView({behavior:"smooth"}); });
+
   function showLoginScreen(){
     document.getElementById("appShell").hidden = true;
     document.getElementById("loginScreen").hidden = false;
+    if (!landingSeen){
+      try { renderLanding(); document.getElementById("landing").hidden = false; } catch(e){ console.warn("landing failed", e); landingSeen = true; }
+    }
     try {
       document.getElementById("login-name-list").innerHTML = (state.users || []).filter(function(u){ return u.active; })
         .map(function(u){ return '<option value="'+esc(u.name)+'">'; }).join("");
@@ -2875,7 +3263,7 @@
       document.getElementById("login-name").value = "";
       document.getElementById("login-error").style.display = "none";
       setSignupMode(false);
-      document.getElementById("login-name").focus();
+      if (landingSeen) document.getElementById("login-name").focus();
       document.getElementById("loginDiag").textContent = "App loaded OK (" + state.dbMode + " mode) — waiting for sign-in.";
     } catch(e){
       console.error("showLoginScreen failed to populate directory list", e);
