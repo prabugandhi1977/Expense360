@@ -75,9 +75,7 @@ await tab('budgets'); await scrollTo('.alert-feed, #alert-feed, #bud-alerts', 's
 await tab('forecast'); await shot('forecast');
 await tab('realloc'); await p.click('[data-re-ok]').catch(() => console.log('no move')); await p.waitForTimeout(600); await tab('audit'); await shot('audit');
 
-// Employee: live receipt scan. The employee form's Amount box currently shares a grid cell with
-// the currency picker and collapses to ~44px, showing only the first digit of the scanned value;
-// give it room in the shot so the real extracted amount reads.
+// Employee: live receipt scan of receipt.html.
 await p.click('#signOutBtn'); await p.waitForTimeout(500);
 await signIn('Ankita Bansal', 'employee');
 await tab('submit');
@@ -90,9 +88,5 @@ await p.waitForFunction(() => { const s = document.getElementById('empexp-receip
   .catch(() => console.log('OCR status:', 'timed out'));
 await p.waitForTimeout(800);
 console.log('OCR status:', await p.textContent('#empexp-receipt-status'));
-// The itemized-lines panel currently renders with collapsed fields in the redesigned theme;
-// keep it out of the marketing shot so the frame shows the extracted fields.
-await p.evaluate(() => { const w = document.getElementById('empexp-items-wrap'); if (w) w.style.display = 'none'; });
-await p.evaluate(() => { const f = document.getElementById('empexp-amount')?.closest('.field'); if (f) f.style.gridColumn = 'span 2'; });
 await shot('receipt-scan');
 await b.close();
