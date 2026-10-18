@@ -64,6 +64,17 @@ MVP1/MVP2 scope from the proposal:
   in one place, with the same approve/reject/override/acknowledge/confirm
   actions available inline.
 
+- **Budget Command Center** (design refresh from the Figma prototype): navy
+  dark theme with DM Sans / DM Mono; Overview now has a Budget Health panel
+  (consumed vs. time elapsed vs. projected year-end), driver-based AI
+  insights, and a Business Unit → Category → Transactions drill-down
+- **Reallocation Engine** tab: matches idle budget in under-utilized Business
+  Units to units projected to overrun; senior Finance approves a move, which
+  updates both annual budgets and is written to the Audit Log
+- **Finance Copilot** (the former Policy Assistant) answers live finance
+  questions — projected overruns, spend drivers by category, reallocation
+  suggestions — with Figma-style suggested prompts
+
 It's a single self-contained `index.html` — no build step, no bundled
 dependencies. Three features load an external service only the moment
 they're actually used: receipt scanning loads the

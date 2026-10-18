@@ -1,0 +1,9 @@
+node_modules/
+marketing/video/silent.mp4
+marketing/samples-*/
+marketing/assets-dark/
+marketing/video/silent*.mp4
+marketing/video/still-*.png
+marketing/shoot-dark.mjs
+marketing/video/composition-dark.html
+marketing/video/composition-mid.html

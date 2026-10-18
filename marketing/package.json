@@ -1,0 +1,15 @@
+{
+  "name": "marketing",
+  "version": "1.0.0",
+  "description": "| File | What it is |\r |---|---|\r | `Expense360-promo.mp4` | 67-second promo, 1920×1080, H.264 with a soft synthesized music bed |\r | `Expense360-promo-720p-silent.mp4` | 1280×720 silent cut for autoplay embeds and social feeds |\r | `assets/*.png` | Retina screenshots of every app screen (2880×1800), taken from `index.html` with its sample data (signed in as \"Finance Team\" and \"Ankita Bansal\"), plus the login screen and a dark-theme overview |",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "playwright": "^1.49.1"
+  }
+}
