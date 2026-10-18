@@ -306,6 +306,12 @@
     padding:9px 10px; width:100%;
   }
   .field textarea{ resize:vertical; min-height:64px; }
+  /* Amount shares its cell with the currency picker: give it two grid columns so the number isn't clipped. */
+  .field-amount{ grid-column:span 2; }
+  .field-amount input{ min-width:90px; }
+  /* Receipt line items sit inside a .field, so undo its full-width input/select rule for their controls. */
+  .field [data-item-row] input[type="checkbox"]{ width:auto; flex:none; padding:0; }
+  .field [data-item-row] select{ width:auto; }
   .form-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:12px; }
 
   .empty{ color:var(--ink-muted); font-size:13px; padding:18px 4px; text-align:center; }
@@ -784,7 +790,7 @@
           </select>
         </div>
         <div class="field" id="exp-mileage-wrap" style="display:none;"><label for="exp-distance">Distance (miles)</label><input id="exp-distance" type="number" min="0" step="0.1"></div>
-        <div class="field"><label for="exp-amount">Amount</label>
+        <div class="field field-amount"><label for="exp-amount">Amount</label>
           <div style="display:flex; gap:6px;">
             <input id="exp-amount" type="number" min="0" step="0.01" required style="flex:1;">
             <select id="exp-currency" class="chip" style="width:auto;">
@@ -956,7 +962,7 @@
           <select id="empexp-cat"><option>Lodging</option><option>Meals</option><option>Transport</option><option>Mileage</option><option>Airfare</option><option>Other</option></select>
         </div>
         <div class="field" id="empexp-mileage-wrap" style="display:none;"><label for="empexp-distance">Distance (miles)</label><input id="empexp-distance" type="number" min="0" step="0.1"></div>
-        <div class="field"><label for="empexp-amount">Amount</label>
+        <div class="field field-amount"><label for="empexp-amount">Amount</label>
           <div style="display:flex; gap:6px;">
             <input id="empexp-amount" type="number" min="0" step="0.01" required style="flex:1;">
             <select id="empexp-currency" class="chip" style="width:auto;">
